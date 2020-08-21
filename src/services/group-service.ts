@@ -51,9 +51,9 @@ export class GroupService {
                     createdAt: { $min: "$createdAt" },
                     updatedAt: { $max: "$updatedAt" },
                 },
-
+                
             },
-            { $sort: { group: 1 } }
+            { $sort: { _id: -1 } },
         ]);
     }
 
@@ -65,7 +65,7 @@ export class GroupService {
     async removeExpiredInstances(age: number) {
         const { deletedCount }  = await this.Group.deleteMany({
             createdAt: {
-                $gte: new Date().getTime() - age
+                $lte: new Date().getTime() - age
             }
         })
         return deletedCount

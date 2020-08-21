@@ -13,7 +13,7 @@
     "include": [
       "src/**/*",
       "__tests__/server.test.ts",
-      "./node_modules/@types/jest", "__tests__/data-access.test.ts"
+      "__tests__/data-access.test.ts"
     ],
     "exclude": ["node_modules", "**/*.spec.ts"]
     }

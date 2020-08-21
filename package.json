@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/src/index.js",
-    "test": "jest",
+    "test": "jest --runInBand",
     "docker": "docker run -d --rm -v ${PWD}:/app --name ubio-debug ubio:latest tail -f /dev/null",
     "compile": "tsc"
   },
@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/axios": "^0.14.0",
+    "@types/bluebird": "^3.5.32",
     "@types/mongoose": "^5.7.36",
     "@types/uuid": "^8.3.0",
     "axios": "^0.20.0",
@@ -30,5 +31,6 @@
     "supertest": "^4.0.2",
     "ts-jest": "^26.2.0",
     "ts-node": "^8.10.2"
-  }
+  },
+  "type": "module"
 }

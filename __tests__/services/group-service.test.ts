@@ -175,7 +175,6 @@ it('Get summmary', async done => {
         group1FirstCreated = await groupService.create(group1, uuidv4());
         group1LastUpdate = await groupService.create(group1, uuidv4());
 
-
         group2FirstCreated = await groupService.create(group2, uuidv4());
         await groupService.create(group2, uuidv4());
         await groupService.create(group2, uuidv4());
@@ -183,45 +182,74 @@ it('Get summmary', async done => {
 
         summary = await groupService.getSummary();
 
-
     } catch (e) {
         console.error('Getting instances by group')
     }
 
     await groupService.Group.collection.drop();
-    const [notParticleDetectorSummary, particleDetectorSummary] = summary;
+    const [group1Summary, group2Summary] = summary;
 
-    expect(particleDetectorSummary.createdAt).toBe(group1FirstCreated.createdAt)
-    expect(particleDetectorSummary.updatedAt).toBe(group1LastUpdate.updatedAt)
+    expect(group1Summary._id).toBe(group1)
+    expect(group2Summary._id).toBe(group2)
 
-    expect(notParticleDetectorSummary.createdAt).toBe(group2FirstCreated.createdAt)
-    expect(notParticleDetectorSummary.updatedAt).toBe(group2LastUpdate.updatedAt)
+    expect(group1Summary.createdAt).toBe(group1FirstCreated.createdAt)
+    expect(group1Summary.updatedAt).toBe(group1LastUpdate.updatedAt)
 
-    expect(notParticleDetectorSummary.instances).toBe(4)
-    expect(particleDetectorSummary.instances).toBe(2)
+    expect(group2Summary.createdAt).toBe(group2FirstCreated.createdAt)
+    expect(group2Summary.updatedAt).toBe(group2LastUpdate.updatedAt)
+
+    expect(group2Summary.instances).toBe(4)
+    expect(group1Summary.instances).toBe(2)
 
 
     done();
 
 })
 
-it('Remove expired instances', async done => {
+it('Remove expired 1000ms old instance - because it is more than 500ms old', async done => {
 
     const group = 'particle-detector';
 
     const collection = uuidv4();
     const groupService = new GroupService(collection);
+    let deletedCount: number;
+
     try {
         await groupService.create(group, uuidv4());
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
-        await groupService.removeExpiredInstances(10000)
+        deletedCount = await groupService.removeExpiredInstances(500)
     } catch (e) {
         e
     }
 
     await groupService.Group.collection.drop();
+    expect(deletedCount).toBe(1)
     done()
 })
+
+it('Do not remove 1000ms old instance - because it is more than 2000ms old', async done => {
+
+    const group = 'particle-detector';
+
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
+    let deletedCount: number;
+
+    try {
+        await groupService.create(group, uuidv4());
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        deletedCount = await groupService.removeExpiredInstances(2000)
+    } catch (e) {
+        e
+    }
+
+    await groupService.Group.collection.drop();
+    expect(deletedCount).toBe(0)
+    done()
+})
+
 
 afterAll(async done => {
     await ubioConnection.close();
