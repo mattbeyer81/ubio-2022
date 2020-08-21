@@ -8,9 +8,9 @@ export class GroupService {
         this.Group = mongoose.model<GroupModel>(collection || 'groups', new mongoose.Schema(groupSchema));
     }
 
-    async create(group: string, groupId: string, meta: any) {
+    async create(group: string, groupId: string, meta?: any) {
         const updatedAt = new Date().getTime();
-        let groupDocument = await this.Group.findOne({groupId});
+        let groupDocument = await this.Group.findOne({ groupId });
         if (groupDocument) {
             groupDocument.updatedAt = updatedAt;
             if (meta) {
@@ -21,12 +21,54 @@ export class GroupService {
             groupDocument = await this.Group.create({
                 groupId,
                 group,
-                createdAt: updatedAt,                     
-                updatedAt,                    
+                createdAt: updatedAt,
+                updatedAt,
                 meta
             })
 
         }
         return groupDocument
     }
+
+    async delete(group: string, groupId: string) {
+        const { deletedCount } = await this.Group.deleteOne({
+            groupId,
+            group
+        })
+        return deletedCount
+    }
+
+    async getInstancesByGroup(group: string) {
+        return await this.Group.find({ group })
+    }
+
+    async getSummary() {
+        return await this.Group.aggregate([
+            {
+                $group: {
+                    _id: "$group",
+                    instances: { $sum: 1 },
+                    createdAt: { $min: "$createdAt" },
+                    updatedAt: { $max: "$updatedAt" },
+                },
+
+            },
+            { $sort: { group: 1 } }
+        ]);
+    }
+
+    /**
+     * Removes expired milliseconds
+     * @param {number} age - The age in milliseconds when an instances expires
+     */
+
+    async removeExpiredInstances(age: number) {
+        const { deletedCount }  = await this.Group.deleteMany({
+            createdAt: {
+                $gte: new Date().getTime() - age
+            }
+        })
+        return deletedCount
+    }
+
 }

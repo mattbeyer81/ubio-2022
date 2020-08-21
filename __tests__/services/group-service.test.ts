@@ -51,9 +51,9 @@ it('Update already created Group', async done => {
     let groupAfterCreation: GroupModel;
     let groupAfterUpdate: GroupModel;
 
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
     try {
-        const collection = uuidv4();
-        const groupService = new GroupService(collection);
         await groupService.create(
             'particle-detector',
             groupId,
@@ -70,13 +70,11 @@ it('Update already created Group', async done => {
                 "foo": 1
             });
 
-
-        await groupService.Group.collection.drop();
-
     } catch (e) {
         console.error('Creating group')
     }
 
+    await groupService.Group.collection.drop();
     expect(groupBeforeCreation).toBe(undefined);
     expect(groupAfterCreation.groupId).toBe(groupId);
 
@@ -85,5 +83,147 @@ it('Update already created Group', async done => {
 
     done();
 
+})
 
+it('Delete', async done => {
+
+    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    const group = 'particle-detector';
+
+    let groupBeforeDelete: GroupModel;
+    let groupAfterDelete: GroupModel;
+    let deletedCount: number;
+
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
+    try {
+        await groupService.create(
+            group,
+            groupId,
+            {
+                "foo": 1
+            });
+
+        groupBeforeDelete = await groupService.Group.findOne({ groupId });
+        deletedCount = await groupService.delete(group, groupId);
+        groupAfterDelete = await groupService.Group.findOne({ groupId });
+
+
+    } catch (e) {
+        console.error('Creating group')
+    }
+    await groupService.Group.collection.drop();
+
+    expect(groupBeforeDelete).not.toBe(undefined);
+    expect(groupAfterDelete).toBe(null);
+    expect(deletedCount).toBe(1);
+
+
+    done();
+
+})
+
+it('Get instances by group', async done => {
+
+    const group = 'particle-detector';
+
+    let groupsBeforeCreation: GroupModel[];
+    let groupsAfterCreation: GroupModel[];
+
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
+    try {
+
+        groupsBeforeCreation = await groupService.getInstancesByGroup(group);
+
+        await groupService.create(group, uuidv4());
+        await groupService.create(group, uuidv4());
+
+        groupsAfterCreation = await groupService.getInstancesByGroup(group);
+
+
+    } catch (e) {
+        console.error('Getting instances by group')
+    }
+    await groupService.Group.collection.drop();
+
+    expect(groupsBeforeCreation.length).toBe(0);
+    expect(groupsAfterCreation.length).toBe(2);
+
+
+    done();
+
+})
+
+it('Get summmary', async done => {
+
+    const group1 = 'particle-detector';
+    const group2 = 'not-particle-detector';
+
+    let group1FirstCreated: GroupModel;
+    let group1LastUpdate: GroupModel;
+
+    let group2FirstCreated: GroupModel;
+    let group2LastUpdate: GroupModel;
+
+    let summary: any;
+
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
+    try {
+
+        group1FirstCreated = await groupService.create(group1, uuidv4());
+        group1LastUpdate = await groupService.create(group1, uuidv4());
+
+
+        group2FirstCreated = await groupService.create(group2, uuidv4());
+        await groupService.create(group2, uuidv4());
+        await groupService.create(group2, uuidv4());
+        group2LastUpdate = await groupService.create(group2, uuidv4());
+
+        summary = await groupService.getSummary();
+
+
+    } catch (e) {
+        console.error('Getting instances by group')
+    }
+
+    await groupService.Group.collection.drop();
+    const [notParticleDetectorSummary, particleDetectorSummary] = summary;
+
+    expect(particleDetectorSummary.createdAt).toBe(group1FirstCreated.createdAt)
+    expect(particleDetectorSummary.updatedAt).toBe(group1LastUpdate.updatedAt)
+
+    expect(notParticleDetectorSummary.createdAt).toBe(group2FirstCreated.createdAt)
+    expect(notParticleDetectorSummary.updatedAt).toBe(group2LastUpdate.updatedAt)
+
+    expect(notParticleDetectorSummary.instances).toBe(4)
+    expect(particleDetectorSummary.instances).toBe(2)
+
+
+    done();
+
+})
+
+it('Remove expired instances', async done => {
+
+    const group = 'particle-detector';
+
+    const collection = uuidv4();
+    const groupService = new GroupService(collection);
+    try {
+        await groupService.create(group, uuidv4());
+
+        await groupService.removeExpiredInstances(10000)
+    } catch (e) {
+        e
+    }
+
+    await groupService.Group.collection.drop();
+    done()
+})
+
+afterAll(async done => {
+    await ubioConnection.close();
+    done();
 })
