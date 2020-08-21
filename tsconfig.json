@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
       "target": "es6",
+      "module": "commonjs",
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
@@ -12,8 +13,7 @@
     },
     "include": [
       "src/**/*",
-      "__tests__/server.test.ts",
-      "__tests__/data-access.test.ts"
+      "__tests__/**/*",
     ],
     "exclude": ["node_modules", "**/*.spec.ts"]
     }

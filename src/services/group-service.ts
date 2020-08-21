@@ -35,7 +35,7 @@ export class GroupService {
             groupId,
             group
         })
-        return deletedCount
+        return deletedCount || 0
     }
 
     async getInstancesByGroup(group: string) {
@@ -68,7 +68,7 @@ export class GroupService {
                 $lte: new Date().getTime() - age
             }
         })
-        return deletedCount
+        return deletedCount || 0
     }
 
 }

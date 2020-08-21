@@ -1,0 +1,11 @@
+stages:
+  - test
+
+test_production:
+  stage: test
+  before_script:
+    - eval $(ssh-agent -s)
+  script:
+    - ssh -o "StrictHostKeyChecking no" -t aston@aston-staging.netsupportsoftware.com "cd /home/aston/AstonProject/backend; sh ./testAll.bash;"
+  only:
+    - "master"
