@@ -1,14 +1,19 @@
 {
     "compilerOptions": {
-      "module": "system",
+      "target": "es6",
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
       "outDir": "./build",
       "sourceMap": true,
       "rootDir": ".",
-      "strict": true
+      "strict": true,
+      "moduleResolution": "node"
     },
-    "include": ["src/**/*", "__tests__/index.test.ts"],
+    "include": [
+      "src/**/*",
+      "__tests__/server.test.ts",
+      "./node_modules/@types/jest", "__tests__/data-access.test.ts"
+    ],
     "exclude": ["node_modules", "**/*.spec.ts"]
     }
