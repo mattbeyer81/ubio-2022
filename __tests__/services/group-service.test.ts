@@ -37,7 +37,7 @@ it('Create Group', async done => {
         console.error('Creating group')
     }
 
-    expect(groupBeforeCreation).toBe(undefined);
+    expect(groupBeforeCreation).toBe(null);
     expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
     done();
 
@@ -75,7 +75,7 @@ it('Update already created Group', async done => {
     }
 
     await groupService.Group.collection.drop();
-    expect(groupBeforeCreation).toBe(undefined);
+    expect(groupBeforeCreation).toBe(null);
     expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
 
     expect(groupAfterCreation && groupAfterCreation.createdAt).toBe(groupAfterUpdate && groupAfterUpdate.createdAt);
