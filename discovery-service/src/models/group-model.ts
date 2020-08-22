@@ -31,3 +31,5 @@ export const groupSchema = {
         required: false
     }
 }
+
+export const Group = mongoose.model<GroupModel>('groups', new mongoose.Schema(groupSchema));

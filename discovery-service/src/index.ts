@@ -1,3 +1,7 @@
-import Server  from "./server"
+import DiscoveryServer from "./server"
+import { ubioConnection } from "./data-access";
 
-new Server;
+ubioConnection.on('open', () =>  {
+    console.log('Connected to mongo')
+    new DiscoveryServer;
+});

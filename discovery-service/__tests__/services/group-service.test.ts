@@ -1,7 +1,7 @@
-import { GroupService } from "../../src/services/group-service";
+import { groupService } from "../../src/services/group-service";
 import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
-import { GroupModel } from "../../src/models/group-model";
+import { GroupModel, Group } from "../../src/models/group-model";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
@@ -22,7 +22,6 @@ it('Create Group', async done => {
 
     try {
         const collection = uuidv4();
-        const groupService = new GroupService(collection);
         await groupService.create(
             'particle-detector',
             groupId,
@@ -30,8 +29,8 @@ it('Create Group', async done => {
                 "foo": 1
             });
 
-        groupAfterCreation = await groupService.Group.findOne({ groupId });
-        await groupService.Group.collection.drop();
+        groupAfterCreation = await Group.findOne({ groupId });
+        await Group.collection.drop();
 
     } catch (e) {
         console.error('Creating group')
@@ -52,7 +51,6 @@ it('Update already created Group', async done => {
     let groupAfterUpdate: GroupModel | null = null;
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     try {
         await groupService.create(
             'particle-detector',
@@ -61,7 +59,7 @@ it('Update already created Group', async done => {
                 "foo": 1
             });
 
-        groupAfterCreation = await groupService.Group.findOne({ groupId });
+        groupAfterCreation = await Group.findOne({ groupId });
 
         groupAfterUpdate = await groupService.create(
             'particle-detector',
@@ -74,7 +72,7 @@ it('Update already created Group', async done => {
         console.error('Creating group')
     }
 
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
     expect(groupBeforeCreation).toBe(null);
     expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
 
@@ -95,7 +93,6 @@ it('Delete', async done => {
     let deletedCount: number = 0;
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     try {
         await groupService.create(
             group,
@@ -104,15 +101,15 @@ it('Delete', async done => {
                 "foo": 1
             });
 
-        groupBeforeDelete = await groupService.Group.findOne({ groupId });
+        groupBeforeDelete = await Group.findOne({ groupId });
         deletedCount = await groupService.delete(group, groupId);
-        groupAfterDelete = await groupService.Group.findOne({ groupId });
+        groupAfterDelete = await Group.findOne({ groupId });
 
 
     } catch (e) {
         console.error('Creating group')
     }
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
 
     expect(groupBeforeDelete).not.toBe(undefined);
     expect(groupAfterDelete).toBe(null);
@@ -131,7 +128,6 @@ it('Get instances by group', async done => {
     let groupsAfterCreation: GroupModel[] = [];
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     try {
 
         groupsBeforeCreation = await groupService.getInstancesByGroup(group);
@@ -145,7 +141,7 @@ it('Get instances by group', async done => {
     } catch (e) {
         console.error('Getting instances by group')
     }
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
 
     expect(groupsBeforeCreation.length).toBe(0);
     expect(groupsAfterCreation.length).toBe(2);
@@ -169,7 +165,6 @@ it('Get summmary', async done => {
     let summary: any;
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     try {
 
         group1FirstCreated = await groupService.create(group1, uuidv4());
@@ -186,7 +181,7 @@ it('Get summmary', async done => {
         console.error('Getting instances by group')
     }
 
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
     const [group1Summary, group2Summary] = summary;
 
     expect(group1Summary._id).toBe(group1)
@@ -211,7 +206,6 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
     const group = 'particle-detector';
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     let deletedCount: number = 0;
 
     try {
@@ -223,7 +217,7 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
         e
     }
 
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
     expect(deletedCount).toBe(1)
     done()
 })
@@ -233,7 +227,6 @@ it('Do not remove 1000ms old instance - because it is more than 2000ms old', asy
     const group = 'particle-detector';
 
     const collection = uuidv4();
-    const groupService = new GroupService(collection);
     let deletedCount: number = 0;
 
     try {
@@ -245,7 +238,7 @@ it('Do not remove 1000ms old instance - because it is more than 2000ms old', asy
         e
     }
 
-    await groupService.Group.collection.drop();
+    await Group.collection.drop();
     expect(deletedCount).toBe(0)
     done()
 })

@@ -43,7 +43,7 @@
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Get summmary",
+          "Update Post",
           "--watch",
           "--runInBand"
         ],

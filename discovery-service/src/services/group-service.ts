@@ -1,16 +1,9 @@
-import * as mongoose from "mongoose";
-import { GroupModel, groupSchema } from "../models/group-model";
+import { Group } from "../models/group-model";
 
-export class GroupService {
-    Group: mongoose.Model<GroupModel, {}>;
-
-    constructor(collection?: string) {
-        this.Group = mongoose.model<GroupModel>(collection || 'groups', new mongoose.Schema(groupSchema));
-    }
-
+class GroupService {
     async create(group: string, groupId: string, meta?: any) {
         const updatedAt = new Date().getTime();
-        let groupDocument = await this.Group.findOne({ groupId });
+        let groupDocument = await Group.findOne({ groupId });
         if (groupDocument) {
             groupDocument.updatedAt = updatedAt;
             if (meta) {
@@ -18,7 +11,7 @@ export class GroupService {
             }
             await groupDocument.save();
         } else {
-            groupDocument = await this.Group.create({
+            groupDocument = await Group.create({
                 groupId,
                 group,
                 createdAt: updatedAt,
@@ -31,7 +24,7 @@ export class GroupService {
     }
 
     async delete(group: string, groupId: string) {
-        const { deletedCount } = await this.Group.deleteOne({
+        const { deletedCount } = await Group.deleteOne({
             groupId,
             group
         })
@@ -39,11 +32,11 @@ export class GroupService {
     }
 
     async getInstancesByGroup(group: string) {
-        return await this.Group.find({ group })
+        return await Group.find({ group })
     }
 
     async getSummary() {
-        return await this.Group.aggregate([
+        return await Group.aggregate([
             {
                 $group: {
                     _id: "$group",
@@ -63,7 +56,7 @@ export class GroupService {
      */
 
     async removeExpiredInstances(age: number) {
-        const { deletedCount }  = await this.Group.deleteMany({
+        const { deletedCount }  = await Group.deleteMany({
             createdAt: {
                 $lte: new Date().getTime() - age
             }
@@ -72,3 +65,5 @@ export class GroupService {
     }
 
 }
+
+export const groupService = new GroupService
