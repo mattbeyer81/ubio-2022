@@ -10,7 +10,9 @@ services:
     ports:
       - "80"
     restart: always
-    privileged: true
+    privileged: true,
+    environment:
+      MILLISECOND_EXPIRY_AGE=$MILLISECOND_EXPIRY_AGE
   mongoservice:
     image: mongo:latest
     ports:

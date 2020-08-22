@@ -21,8 +21,7 @@ it('Create Group', async done => {
     let groupAfterCreation: GroupModel | null = null;
 
     try {
-        const collection = uuidv4();
-        await groupService.create(
+        await groupService.register(
             'particle-detector',
             groupId,
             {
@@ -50,9 +49,8 @@ it('Update already created Group', async done => {
     let groupAfterCreation: GroupModel | null = null;
     let groupAfterUpdate: GroupModel | null = null;
 
-    const collection = uuidv4();
     try {
-        await groupService.create(
+        await groupService.register(
             'particle-detector',
             groupId,
             {
@@ -61,7 +59,7 @@ it('Update already created Group', async done => {
 
         groupAfterCreation = await Group.findOne({ groupId });
 
-        groupAfterUpdate = await groupService.create(
+        groupAfterUpdate = await groupService.register(
             'particle-detector',
             groupId,
             {
@@ -77,7 +75,7 @@ it('Update already created Group', async done => {
     expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
 
     expect(groupAfterCreation && groupAfterCreation.createdAt).toBe(groupAfterUpdate && groupAfterUpdate.createdAt);
-    // expect(groupAfterCreation && groupAfterCreation.updatedAt).toBeLessThan(groupAfterUpdate.updatedAt);
+    // expect(groupAfterCreation && groupAfterCreation.updatedAt).toBeLessThan(groupAfterUpdate && groupAfterUpdate.updatedAt);
 
     done();
 
@@ -94,7 +92,7 @@ it('Delete', async done => {
 
     const collection = uuidv4();
     try {
-        await groupService.create(
+        await groupService.register(
             group,
             groupId,
             {
@@ -130,12 +128,12 @@ it('Get instances by group', async done => {
     const collection = uuidv4();
     try {
 
-        groupsBeforeCreation = await groupService.getInstancesByGroup(group);
+        groupsBeforeCreation = await groupService.getByGroup(group);
 
-        await groupService.create(group, uuidv4());
-        await groupService.create(group, uuidv4());
+        await groupService.register(group, uuidv4());
+        await groupService.register(group, uuidv4());
 
-        groupsAfterCreation = await groupService.getInstancesByGroup(group);
+        groupsAfterCreation = await groupService.getByGroup(group);
 
 
     } catch (e) {
@@ -164,16 +162,15 @@ it('Get summmary', async done => {
 
     let summary: any;
 
-    const collection = uuidv4();
     try {
 
-        group1FirstCreated = await groupService.create(group1, uuidv4());
-        group1LastUpdate = await groupService.create(group1, uuidv4());
+        group1FirstCreated = await groupService.register(group1, uuidv4());
+        group1LastUpdate = await groupService.register(group1, uuidv4());
 
-        group2FirstCreated = await groupService.create(group2, uuidv4());
-        await groupService.create(group2, uuidv4());
-        await groupService.create(group2, uuidv4());
-        group2LastUpdate = await groupService.create(group2, uuidv4());
+        group2FirstCreated = await groupService.register(group2, uuidv4());
+        await groupService.register(group2, uuidv4());
+        await groupService.register(group2, uuidv4());
+        group2LastUpdate = await groupService.register(group2, uuidv4());
 
         summary = await groupService.getSummary();
 
@@ -205,11 +202,10 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
 
     const group = 'particle-detector';
 
-    const collection = uuidv4();
     let deletedCount: number = 0;
 
     try {
-        await groupService.create(group, uuidv4());
+        await groupService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         deletedCount = await groupService.removeExpiredInstances(500)
@@ -225,12 +221,10 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
 it('Do not remove 1000ms old instance - because it is more than 2000ms old', async done => {
 
     const group = 'particle-detector';
-
-    const collection = uuidv4();
     let deletedCount: number = 0;
 
     try {
-        await groupService.create(group, uuidv4());
+        await groupService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         deletedCount = await groupService.removeExpiredInstances(2000)

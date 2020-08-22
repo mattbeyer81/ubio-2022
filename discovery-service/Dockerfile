@@ -3,7 +3,10 @@ FROM mhart/alpine-node:10
 RUN apk update
 WORKDIR /app
 
-RUN mkdir /etc/periodic/1min
-RUN crontab -l | { cat; echo "*    *       *       *       *       run-parts /etc/periodic/1min"; } | crontab -
+RUN cd /app 
+COPY . .
+RUN npm ci && npm run compile
 
-CMD ["crond", "-f"]
+EXPOSE 3000
+
+CMD ["npm", "start"]

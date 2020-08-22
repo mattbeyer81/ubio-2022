@@ -2,6 +2,8 @@
 import * as supertest from 'supertest';
 import { app } from "../src/app"
 import { ubioConnection } from '../src/data-access';
+import { v4 as uuidv4 } from 'uuid';
+import { Group } from '../src/models/group-model';
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
@@ -13,15 +15,18 @@ beforeAll(done => {
     }
 })
 
-it('Create New Post', async done => {
+it('Register instance for first time', async done => {
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     const res = await supertest(app)
         .post('/particle-detector/' + groupId)
-    expect(res.body.groupId).toBe(groupId)
+    const instance = res.body;
+    expect(instance.groupId).toBe(groupId)
+    expect(instance.createdAt).toBe(instance.updatedAt)
+
     done()
 })
 
-it('Update Post', async done => {
+it('Update instance', async done => {
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
 
     const firstResponse = await supertest(app)
@@ -39,6 +44,37 @@ it('Update Post', async done => {
 
     done()
 })
+
+it('Delete instance', async done => {
+    const groupId = uuidv4();
+    const group = 'particle-detector';                                                                                                                                            
+
+    await supertest(app)
+        .post(`/${group}/${group}`)
+
+    const beforeDelete = await Group.findOne({ groupId });
+    expect(beforeDelete && beforeDelete.groupId).toBe(groupId)
+
+    const deleteResponse = await supertest(app)
+        .delete(`/${group}/${group}`)
+
+
+    expect(deleteResponse.text).toBe(1)
+    const afteDelete = await Group.findOne({ groupId });
+    expect(afteDelete).toBe(null)
+
+    done()
+})
+
+it('Get summary', async done => {
+    done()
+})
+
+
+it('Get instances by group', async done => {
+    done()
+})
+
 
 afterAll(async done => {
     await ubioConnection.close();

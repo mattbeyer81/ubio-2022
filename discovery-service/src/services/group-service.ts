@@ -1,7 +1,7 @@
 import { Group } from "../models/group-model";
 
 class GroupService {
-    async create(group: string, groupId: string, meta?: any) {
+    async register(group: string, groupId: string, meta?: any) {
         const updatedAt = new Date().getTime();
         let groupDocument = await Group.findOne({ groupId });
         if (groupDocument) {
@@ -31,7 +31,7 @@ class GroupService {
         return deletedCount || 0
     }
 
-    async getInstancesByGroup(group: string) {
+    async getByGroup(group: string) {
         return await Group.find({ group })
     }
 
@@ -42,7 +42,7 @@ class GroupService {
                     _id: "$group",
                     instances: { $sum: 1 },
                     createdAt: { $min: "$createdAt" },
-                    updatedAt: { $max: "$updatedAt" },
+                    lastUpdatedAt: { $max: "$updatedAt" },
                 },
                 
             },

@@ -1,7 +1,7 @@
 
 import Axios from "axios"
 
-it('Create Group', async done => {
+it('Register application for first time', async done => {
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     let groupIdResult: string = '';
     try {
@@ -9,7 +9,6 @@ it('Create Group', async done => {
         groupIdResult = response.data.groupId;
     } catch(e) {
         console.error('There was an error creating group')
-        e
     }
     expect(groupId).toBe(groupIdResult) 
     done()
