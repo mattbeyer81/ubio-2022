@@ -1,6 +1,9 @@
-FROM mhart/alpine-node:12
+FROM mhart/alpine-node:10
 
 RUN apk update
 WORKDIR /app
 
-CMD ["tail", "-f", "/dev/null"]
+RUN mkdir /etc/periodic/1min
+RUN crontab -l | { cat; echo "*    *       *       *       *       run-parts /etc/periodic/1min"; } | crontab -
+
+CMD ["crond", "-f"]

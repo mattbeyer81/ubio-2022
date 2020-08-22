@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
-      "target": "es6",
       "module": "commonjs",
+      "target": "es2016",
+      "moduleResolution": "node",
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
@@ -9,7 +10,7 @@
       "sourceMap": true,
       "rootDir": ".",
       "strict": true,
-      "moduleResolution": "node"
+      "skipLibCheck": true
     },
     "include": [
       "src/**/*",

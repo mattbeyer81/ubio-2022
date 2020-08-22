@@ -2,6 +2,23 @@
     "version": "0.2.0",
     "configurations": [
       {
+        "type": "node",
+        "request": "launch",
+        "name": "Current",
+        "protocol": "inspector",
+        "console": "integratedTerminal",
+        "program": "${file}",
+        "cwd": "${workspaceFolder}",
+        "outFiles": [
+          "${workspaceFolder}/build/**/*.js"
+        ],
+        "envFile": "${workspaceFolder}/.env",
+        "runtimeArgs": [
+          "--experimental-specifier-resolution=node",
+          "--experimental-modules"
+        ],
+      },
+      {
         "name": "Debug Current Jest File",
         "type": "node",
         "request": "launch",
