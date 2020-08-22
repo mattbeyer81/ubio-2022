@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node build/src/index.js",
     "test": "jest --runInBand",
-    "docker": "docker run -d --rm -v ${PWD}:/app --name ubio-debug ubio:latest tail -f /dev/null",
+    "docker": "docker run -d --rm -v ${PWD}:/app --network=ubio_default --name discoveryservice-debug ubio/discoveryservice:latest tail -f /dev/null",
     "compile": "tsc"
   },
   "author": "",

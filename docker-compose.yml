@@ -1,0 +1,21 @@
+version: "2"
+services:
+  discoveryservice:
+    image: ubio/discoveryservice
+    build: ./discovery-service
+    networks:
+      - ubio_default
+    depends_on:
+      - mongoservice
+    ports:
+      - "80"
+    restart: always
+    privileged: true
+  mongoservice:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    restart: always
+networks:
+  ubio_default:
+    external: true

@@ -4,7 +4,7 @@ import * as  Bluebird from 'bluebird';
 import { GroupModel, groupSchema } from "../src/models/group-model";
 (<any>mongoose).Promise = Bluebird;
 
-const connectionString = `mongodb://localhost:27017/ubio`
+const connectionString = `mongodb://ubio_mongoservice_1/ubio`
 
 console.log(`Collecting to: ${connectionString}`);
 mongoose.connect(connectionString);
@@ -16,7 +16,7 @@ it('Connect', done => {
 
         const Group = mongoose.model<GroupModel>('groups', new mongoose.Schema(groupSchema));
 
-        await Group.create({
+        const group = await Group.create({
             "groupId": "e335175a-eace-4a74-b99c-c6466b6afadd",
             "group": "particle-detector",
             "createdAt": 1571418096158,                     
@@ -30,3 +30,7 @@ it('Connect', done => {
 
 })
 
+afterAll(async done => {
+    await connection.close();
+    done();
+})
