@@ -1,6 +1,6 @@
 FROM mhart/alpine-node:10
 
-RUN apk update
+RUN apk update && apk add curl
 WORKDIR /app
 
 RUN cd /app 

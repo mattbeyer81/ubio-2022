@@ -7,8 +7,6 @@ services:
       - ubio_default
     depends_on:
       - mongoservice
-    ports:
-      - "80"
     restart: always
     privileged: true
     environment:

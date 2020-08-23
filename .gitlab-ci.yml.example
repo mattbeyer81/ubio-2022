@@ -1,0 +1,23 @@
+stages:
+  - test
+  - deploy
+
+deploy_testing:
+  stage: deploy
+  environment:
+    name: development
+    url: https://testing.example.com
+  before_script:
+    - eval $(ssh-agent -s)
+  script:
+    - ssh -p22 -o "StrictHostKeyChecking no" testing@testing.example.com "mkdir -p /home"
+    - rsync -r -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --exclude='node_modules' --exclude='build' --delete-excluded ./ testing@testing.example.com:/home
+
+test_testing:
+  stage: test
+  before_script:
+    - eval $(ssh-agent -s)
+  script:
+    - ssh -p22 -o "StrictHostKeyChecking no" testing@testing.example.com "mkdir -p /home"
+    - rsync -r -e ssh --exclude='.git/' --exclude='.gitlab-ci.yml' --exclude='node_modules' --exclude='build' --delete-excluded ./ testing.example.com:/home
+    - ssh -o "StrictHostKeyChecking no" -t testing@testing.example.com "cd /home/; sh docker exec ubio_discoveryservice_1 sh -c "npm test -- -v""
