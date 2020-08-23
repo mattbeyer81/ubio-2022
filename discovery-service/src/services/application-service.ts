@@ -1,10 +1,35 @@
 import { Application } from "../models/application-model";
 import { ResponseInstance } from "../responses";
 
+export class GroupNotProvidedError extends Error {
+    constructor(m?: string) {
+        super(m);
+        this.message = 'Group not provided'
+        Object.setPrototypeOf(this, GroupNotProvidedError.prototype);
+    }
+}
+
+export class ApplicationIdNotProvidedError extends Error {
+    constructor(m?: string) {
+        super(m);
+        this.message = 'Group id not provided'
+        Object.setPrototypeOf(this, ApplicationIdNotProvidedError.prototype);
+    }
+}
+
 class ApplicationService {
-    async register(group: string, groupId: string, meta?: any) {
+    async register(group: string, applicationId: string, meta?: any) {
+
+        if (!group) {
+            throw new GroupNotProvidedError
+        }
+
+        if (!applicationId) {
+            throw new ApplicationIdNotProvidedError
+        }
+
         const updatedAt = new Date().getTime();
-        let appplicationDocument = await Application.findOne({ groupId });
+        let appplicationDocument = await Application.findOne({ applicationId });
         if (appplicationDocument) {
             appplicationDocument.updatedAt = updatedAt;
             if (meta) {
@@ -13,7 +38,7 @@ class ApplicationService {
             await appplicationDocument.save();
         } else {
             appplicationDocument = await Application.create({
-                groupId,
+                applicationId,
                 group,
                 createdAt: updatedAt,
                 updatedAt,
@@ -22,7 +47,7 @@ class ApplicationService {
 
         }
         const responseInstance: ResponseInstance = {
-            id: appplicationDocument.groupId,
+            id: appplicationDocument.applicationId,
             group: appplicationDocument.group,
             createdAt: appplicationDocument.createdAt,
             updatedAt: appplicationDocument.updatedAt,
@@ -31,15 +56,24 @@ class ApplicationService {
         return responseInstance
     }
 
-    async delete(group: string, groupId: string) {
+    async delete(group: string, applicationId: string) {
+        if (!group) {
+            throw new GroupNotProvidedError
+        }
+        if (!applicationId) {
+            throw new ApplicationIdNotProvidedError
+        }
         const { deletedCount } = await Application.deleteOne({
-            groupId,
+            applicationId,
             group
         })
         return deletedCount || 0
     }
 
     async getByGroup(group: string) {
+        if (!group) {
+            throw new GroupNotProvidedError
+        }
         return await Application.find({ group })
     }
 

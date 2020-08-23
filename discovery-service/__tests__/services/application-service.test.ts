@@ -1,4 +1,4 @@
-import { applicationService } from "../../src/services/application-service";
+import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from "../../src/services/application-service";
 import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
 import { ApplicationModel, Application } from "../../src/models/application-model";
@@ -14,9 +14,9 @@ beforeAll(done => {
     }
 })
 
-it('Register instance for first time', async done => {
+it('Register applicationn instance for first time', async done => {
 
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
 
     let groupBeforeCreation: ApplicationModel | null = null;
     let groupAfterCreation: ApplicationModel | null = null;
@@ -24,11 +24,11 @@ it('Register instance for first time', async done => {
     try {
         const res = await applicationService.register(
             'particle-detector',
-            groupId,
+            applicationId,
             {
                 "foo": 1
             });
-        groupAfterCreation = await Application.findOne({ groupId });
+        groupAfterCreation = await Application.findOne({ applicationId });
         await Application.collection.drop();
 
     } catch (e) {
@@ -36,14 +36,54 @@ it('Register instance for first time', async done => {
     }
 
     expect(groupBeforeCreation).toBe(null);
-    expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
+    expect(groupAfterCreation && groupAfterCreation.applicationId).toBe(applicationId);
+    done();
+
+})
+
+it('Register applicationn instance for first time - with no group', async done => {
+
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
+
+    try {
+        await applicationService.register(
+            '',
+            applicationId,
+            {
+                "foo": 1
+            });
+
+    } catch (e) {
+        expect(e instanceof GroupNotProvidedError).toBe(true)
+    }
+
+    done();
+
+})
+
+it('Register applicationn instance for first time - with no id', async done => {
+
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
+
+    try {
+        await applicationService.register(
+            'foo-bar-group',
+            '',
+            {
+                "foo": 1
+            });
+
+    } catch (e) {
+        expect(e instanceof ApplicationIdNotProvidedError).toBe(true)
+    }
+
     done();
 
 })
 
 it('Update already created Application', async done => {
 
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
     ubioConnection.states.connected
     let groupBeforeCreation: ApplicationModel | null = null;
     let groupAfterCreation: ApplicationModel | null = null;
@@ -52,16 +92,16 @@ it('Update already created Application', async done => {
     try {
         await applicationService.register(
             'particle-detector',
-            groupId,
+            applicationId,
             {
                 "foo": 1
             });
 
-        groupAfterCreation = await Application.findOne({ groupId });
+        groupAfterCreation = await Application.findOne({ applicationId });
 
         groupAfterUpdate = await applicationService.register(
             'particle-detector',
-            groupId,
+            applicationId,
             {
                 "foo": 1
             });
@@ -72,7 +112,7 @@ it('Update already created Application', async done => {
 
     await Application.collection.drop();
     expect(groupBeforeCreation).toBe(null);
-    expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
+    expect(groupAfterCreation && groupAfterCreation.applicationId).toBe(applicationId);
 
     expect(groupAfterCreation && groupAfterCreation.createdAt).toBe(groupAfterUpdate && groupAfterUpdate.createdAt);
     // expect(groupAfterCreation && groupAfterCreation.updatedAt).toBeLessThan(groupAfterUpdate && groupAfterUpdate.updatedAt);
@@ -83,25 +123,24 @@ it('Update already created Application', async done => {
 
 it('Delete', async done => {
 
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     const group = 'particle-detector';
 
-    let groupBeforeDelete: ApplicationModel | null = null;
-    let groupAfterDelete: ApplicationModel | null = null;
+    let applicationBeforeDelete: ApplicationModel | null = null;
+    let applicationAfterDelete: ApplicationModel | null = null;
     let deletedCount: number = 0;
 
-    const collection = uuidv4();
     try {
         await applicationService.register(
             group,
-            groupId,
+            applicationId,
             {
                 "foo": 1
             });
 
-        groupBeforeDelete = await Application.findOne({ groupId });
-        deletedCount = await applicationService.delete(group, groupId);
-        groupAfterDelete = await Application.findOne({ groupId });
+        applicationBeforeDelete = await Application.findOne({ applicationId });
+        deletedCount = await applicationService.delete(group, applicationId);
+        applicationAfterDelete = await Application.findOne({ applicationId });
 
 
     } catch (e) {
@@ -109,8 +148,8 @@ it('Delete', async done => {
     }
     await Application.collection.drop();
 
-    expect(groupBeforeDelete).not.toBe(undefined);
-    expect(groupAfterDelete).toBe(null);
+    expect(applicationBeforeDelete).not.toBe(undefined);
+    expect(applicationAfterDelete).toBe(null);
     expect(deletedCount).toBe(1);
 
 
@@ -118,6 +157,24 @@ it('Delete', async done => {
 
 })
 
+
+it('Delete - no group provided', async done => {
+    try {
+        await applicationService.delete('', 'foo-bar-id');
+    } catch (e) {
+        expect(e instanceof GroupNotProvidedError).toBe(true)
+        done();
+    }
+})
+
+it('Delete - no id provided', async done => {
+    try {
+        await applicationService.delete('foo-bar-id', '');
+    } catch (e) {
+        expect(e instanceof ApplicationIdNotProvidedError).toBe(true)
+        done();
+    }
+})
 
 
 it('Get summary', async done => {
@@ -144,7 +201,6 @@ it('Get summary', async done => {
         group2LastUpdate = await applicationService.register(group2, uuidv4());
 
         summary = await applicationService.getSummary();
-        console.log(JSON.stringify(summary))
 
     } catch (e) {
         console.error('Getting instances by group')
@@ -185,7 +241,6 @@ it('Get instances by group', async done => {
         await applicationService.register(group, uuidv4());
 
         groupsAfterCreation = await applicationService.getByGroup(group);
-        console.log(JSON.stringify(groupsAfterCreation))
 
     } catch (e) {
         console.error('Getting instances by group')
@@ -199,6 +254,18 @@ it('Get instances by group', async done => {
     done();
 
 })
+
+it('Get instances by group - no group provided', async done => {
+
+    try {
+        await applicationService.getByGroup('');
+    } catch (e) {
+        expect(e instanceof GroupNotProvidedError).toBe(true)
+        done();
+    }
+
+})
+
 
 it('Remove expired 1000ms old instance - because it is more than 500ms old', async done => {
 

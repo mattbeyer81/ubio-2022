@@ -1,72 +1,69 @@
 
 import * as supertest from 'supertest';
 import { app } from "../src/app"
-import { applicationService } from '../src/services/application-service';
+import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from '../src/services/application-service';
 import { ApplicationModel } from '../src/models/application-model';
 import { v4 as uuidv4 } from 'uuid';
 import { ResponseInstance } from '../src/responses';
 
 
 it('Register instance for first time', async done => {
-
     const createdAt = 1598105159821;
-
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    jest.spyOn(applicationService, 'register').mockImplementation((group: string, applicationId: string) => {
         return Promise.resolve({
-            "id": "5f4126477e642662ad7c59f5",
+            "id": applicationId,
             "group": "particle-detector",
             "createdAt": createdAt,
             "updatedAt": createdAt,
             "meta": {
                 "foo": 1
             }
-        } as ResponseInstance)
+        })
     })
-
     const res = await supertest(app)
-        .post('/particle-detector/' + groupId)
-    const instance = res.body;
-    expect(instance.groupId).toBe(groupId)
+        .post('/particle-detector/' + applicationId)
+    const instance: ResponseInstance = res.body;
+    expect(instance.id).toBe(applicationId)
     expect(instance.createdAt).toBe(createdAt)
     expect(instance.updatedAt).toBe(createdAt)
 
     done()
 })
 
-it('Register instance for first time - with no groupId', async done => {
+it('Register instance for first time - with no id', async done => {
 
-    const createdAt = 1598105159821;
-
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
-        throw new Error('')
-        return Promise.resolve({
-            "_id": "5f4126477e642662ad7c59f5",
-            "groupId": groupId,
-            "group": "particle-detector",
-            "createdAt": createdAt,
-            "updatedAt": createdAt,
-            "__v": 0,
-            "meta": {
-                "foo": 1
-            }
-        } as ApplicationModel)
+        throw new ApplicationIdNotProvidedError()
     })
 
     const res = await supertest(app)
-        .post('/particle-detector/' + groupId)
-    const instance = res.body;
-    expect(instance.groupId).toBe(groupId)
-    expect(instance.createdAt).toBe(createdAt)
-    expect(instance.updatedAt).toBe(createdAt)
+        .post('/particle-detector/' + applicationId)
+    expect(res.status).toBe(404)
+    expect(res.text).toBe('Group id not provided')
+
+    done()
+})
+
+it('Register instance for first time - with no group', async done => {
+
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
+        throw new GroupNotProvidedError()
+    })
+
+    const res = await supertest(app)
+        .post('/particle-detector/' + applicationId)
+    expect(res.status).toBe(404)
+    expect(res.text).toBe('Group not provided')
 
     done()
 })
 
 it('Delete instance', async done => {
     const groupId = uuidv4();
-    const group = 'particle-detector';                                                                                                                                            
+    const group = 'particle-detector';
 
     jest.spyOn(applicationService, 'delete').mockImplementation((groupId: string) => {
         return Promise.resolve(1)
@@ -76,6 +73,40 @@ it('Delete instance', async done => {
         .delete(`/${group}/${groupId}`)
 
     expect(deleteResponse.body.deletedCount).toBe(1)
+
+    done()
+})
+
+it('Delete instance - no group provided', async done => {
+    const groupId = uuidv4();
+    const group = 'particle-detector';
+
+    jest.spyOn(applicationService, 'delete').mockImplementation((group: string, groupId: string) => {
+        throw new GroupNotProvidedError()
+    })
+
+    const response = await supertest(app)
+        .delete(`/${group}/${groupId}`)
+
+        expect(response.status).toBe(404)
+        expect(response.text).toBe('Group not provided')
+
+    done()
+})
+
+it('Delete instance - no id provided', async done => {
+    const groupId = uuidv4();
+    const group = 'particle-detector';
+
+    jest.spyOn(applicationService, 'delete').mockImplementation((group: string, groupId: string) => {
+        throw new ApplicationIdNotProvidedError()
+    })
+
+    const response = await supertest(app)
+        .delete(`/${group}/${groupId}`)
+
+        expect(response.status).toBe(404)
+        expect(response.text).toBe('Group id not provided')
 
     done()
 })
@@ -101,7 +132,7 @@ it('Get summary', async done => {
     const response = await supertest(app).get('/');
 
     const body = response.body;
-    const [ firstGroup, secondGroup ] = body;
+    const [firstGroup, secondGroup] = body;
     expect(firstGroup.createdAt).toBe(1598163492534)
     expect(firstGroup.lastUpdatedAt).toBe(1598163492619)
     expect(secondGroup.createdAt).toBe(1598163492628)
@@ -116,20 +147,16 @@ it('Get instances by group', async done => {
     jest.spyOn(applicationService, 'getByGroup').mockImplementation((group: string) => {
         return Promise.resolve([
             {
-                "_id": "5f420bf75b46ad174421f260",
-                "groupId": "7e14d0f7-6d3d-4372-bdff-ce85649e3874",
+                "id": "7e14d0f7-6d3d-4372-bdff-ce85649e3874",
                 group,
                 "createdAt": 1598163959678,
                 "updatedAt": 1598163959678,
-                "__v": 0
             },
             {
-                "_id": "5f420bf75b46ad174421f261",
-                "groupId": "a04f27db-2191-4451-8f82-074f22cd2cdc",
+                "id": "5f420bf75b46ad174421f261",
                 group,
                 "createdAt": 1598163959735,
                 "updatedAt": 1598163959735,
-                "__v": 0
             }
         ] as ApplicationModel[])
     })
@@ -146,3 +173,15 @@ it('Get instances by group', async done => {
     done()
 })
 
+it('Get instances by group - no group provided', async done => {
+    const group = 'particle-detector';
+    jest.spyOn(applicationService, 'getByGroup').mockImplementation((group: string) => {
+        throw new GroupNotProvidedError()
+    })
+
+    const res = await supertest(app).get('/' + group);
+    expect(res.status).toBe(404)
+    expect(res.text).toBe('Group not provided')
+
+    done()
+})

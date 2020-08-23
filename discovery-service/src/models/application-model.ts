@@ -2,7 +2,7 @@ import * as mongoose from "mongoose";
 
 export interface ApplicationModel extends mongoose.Document {
     id: string;
-    groupId: string;
+    applicationId: string;
     group: string;
     createdAt: number;
     updatedAt: number;
@@ -10,7 +10,7 @@ export interface ApplicationModel extends mongoose.Document {
 }
 
 export const applicationSchema = {
-    groupId: {
+    applicationId: {
         type: String,
         required: true
     },

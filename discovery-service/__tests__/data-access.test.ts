@@ -13,9 +13,9 @@ it('Connect', done => {
     connection.on('open', async function () {
         console.log(`Connection open to ${connectionString} at ${(new Date).toISOString()}`);
 
-        const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-        const group = await Application.create({
-            groupId,
+        const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+        const application = await Application.create({
+            applicationId,
             "group": "particle-detector",
             "createdAt": 1571418096158,                     
             "updatedAt": 1571418124127,                    
@@ -23,7 +23,7 @@ it('Connect', done => {
                 "foo": 1
             }
         })
-        expect(group.groupId).toBe(groupId)
+        expect(application.applicationId).toBe(applicationId)
         done()
     });
 

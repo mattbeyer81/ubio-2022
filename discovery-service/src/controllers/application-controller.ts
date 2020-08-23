@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { applicationService } from "../services/application-service";
+import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from "../services/application-service";
 
 
 export class ApplicationController {
@@ -9,7 +9,11 @@ export class ApplicationController {
             const group = await applicationService.register(params.group, params.id);
             res.send(group)
         } catch (e) {
-            next(e)
+            if (e instanceof GroupNotProvidedError || ApplicationIdNotProvidedError) {
+                res.status(404).send(e.message)
+            } else {
+                next(e)
+            }
         }
     }
 
@@ -27,7 +31,11 @@ export class ApplicationController {
             const group = await applicationService.getByGroup(req.params.group);
             res.send(group)
         } catch (e) {
-            next(e)
+            if (e instanceof GroupNotProvidedError) {
+                res.status(404).send(e.message)
+            } else {
+                next(e)
+            }
         }
     }
 
@@ -37,7 +45,11 @@ export class ApplicationController {
             const deletedCount = await applicationService.delete(params.group, params.id);
             res.send({ deletedCount })
         } catch (e) {
-            next(e)
+            if (e instanceof GroupNotProvidedError || ApplicationIdNotProvidedError) {
+                res.status(404).send(e.message)
+            } else {
+                next(e)
+            }
         }
     }
 
