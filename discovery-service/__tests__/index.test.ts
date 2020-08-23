@@ -1,15 +1,17 @@
 
 import Axios from "axios"
+import { ResponseInstance } from "../src/responses";
 
 it('Register application for first time', async done => {
-    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    let groupIdResult: string = '';
+    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    let applicationIdResult: string = '';
     try {
-        const response = await Axios.post('http://localhost:3000/particle-detector/' + groupId);
-        groupIdResult = response.data.groupId;
+        const response = await Axios.post('http://localhost:3000/particle-detector/' + applicationId);
+        const applicationInstance: ResponseInstance = response.data;
+        applicationIdResult = applicationInstance.id
     } catch(e) {
         console.error('There was an error creating group')
     }
-    expect(groupId).toBe(groupIdResult) 
+    expect(applicationId).toBe(applicationIdResult)
     done()
 })

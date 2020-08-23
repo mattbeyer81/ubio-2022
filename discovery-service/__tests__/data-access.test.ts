@@ -1,18 +1,16 @@
 import * as mongoose from "mongoose";
+import * as fs from "fs"
 import * as  Bluebird from 'bluebird';
 import { Application } from "../src/models/application-model";
 (<any>mongoose).Promise = Bluebird;
 
 const connectionString = `mongodb://${process.env.MONGO_HOST || 'ubio_mongoservice_1'}:27017/ubio`
 
-console.log(`Collecting to: ${connectionString}`);
-mongoose.connect(connectionString);
+mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true } );
 const connection = mongoose.connection;
 
 it('Connect', done => {
     connection.on('open', async function () {
-        console.log(`Connection open to ${connectionString} at ${(new Date).toISOString()}`);
-
         const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
         const application = await Application.create({
             applicationId,
