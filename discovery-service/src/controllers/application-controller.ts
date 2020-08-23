@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { groupService } from "../services/group-service";
+import { applicationService } from "../services/application-service";
 
 
-export class GroupController {
+export class ApplicationController {
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;
-            const group = await groupService.register(params.group, params.id);
+            const group = await applicationService.register(params.group, params.id);
             res.send(group)
         } catch (e) {
             next(e)
@@ -15,7 +15,7 @@ export class GroupController {
 
     async getSummary(req: Request, res: Response, next: NextFunction) {
         try {
-            const group = await groupService.getSummary();
+            const group = await applicationService.getSummary();
             res.send(group)
         } catch (e) {
             next(e)
@@ -24,7 +24,7 @@ export class GroupController {
 
     async getByGroup(req: Request, res: Response, next: NextFunction) {
         try {
-            const group = await groupService.getByGroup(req.params.group);
+            const group = await applicationService.getByGroup(req.params.group);
             res.send(group)
         } catch (e) {
             next(e)
@@ -34,7 +34,7 @@ export class GroupController {
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;
-            const deletedCount = await groupService.delete(params.group, params.id);
+            const deletedCount = await applicationService.delete(params.group, params.id);
             res.send({ deletedCount })
         } catch (e) {
             next(e)

@@ -1,7 +1,8 @@
-import { groupService } from "../../src/services/application-service";
+import { applicationService } from "../../src/services/application-service";
 import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
 import { ApplicationModel, Application } from "../../src/models/application-model";
+import { ResponseInstance } from "../../src/responses";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
@@ -21,7 +22,7 @@ it('Register instance for first time', async done => {
     let groupAfterCreation: ApplicationModel | null = null;
 
     try {
-        const res = await groupService.register(
+        const res = await applicationService.register(
             'particle-detector',
             groupId,
             {
@@ -46,10 +47,10 @@ it('Update already created Application', async done => {
     ubioConnection.states.connected
     let groupBeforeCreation: ApplicationModel | null = null;
     let groupAfterCreation: ApplicationModel | null = null;
-    let groupAfterUpdate: ApplicationModel | null = null;
+    let groupAfterUpdate: ResponseInstance | null = null;
 
     try {
-        await groupService.register(
+        await applicationService.register(
             'particle-detector',
             groupId,
             {
@@ -58,7 +59,7 @@ it('Update already created Application', async done => {
 
         groupAfterCreation = await Application.findOne({ groupId });
 
-        groupAfterUpdate = await groupService.register(
+        groupAfterUpdate = await applicationService.register(
             'particle-detector',
             groupId,
             {
@@ -91,7 +92,7 @@ it('Delete', async done => {
 
     const collection = uuidv4();
     try {
-        await groupService.register(
+        await applicationService.register(
             group,
             groupId,
             {
@@ -99,7 +100,7 @@ it('Delete', async done => {
             });
 
         groupBeforeDelete = await Application.findOne({ groupId });
-        deletedCount = await groupService.delete(group, groupId);
+        deletedCount = await applicationService.delete(group, groupId);
         groupAfterDelete = await Application.findOne({ groupId });
 
 
@@ -124,25 +125,25 @@ it('Get summary', async done => {
     const group1 = 'particle-detector';
     const group2 = 'not-particle-detector';
 
-    let group1FirstCreated: ApplicationModel;
-    let group1LastUpdate: ApplicationModel;
+    let group1FirstCreated: ResponseInstance;
+    let group1LastUpdate: ResponseInstance;
 
-    let group2FirstCreated: ApplicationModel;
-    let group2LastUpdate: ApplicationModel;
+    let group2FirstCreated: ResponseInstance;
+    let group2LastUpdate: ResponseInstance;
 
     let summary: any;
 
     try {
 
-        group1FirstCreated = await groupService.register(group1, uuidv4());
-        group1LastUpdate = await groupService.register(group1, uuidv4());
+        group1FirstCreated = await applicationService.register(group1, uuidv4());
+        group1LastUpdate = await applicationService.register(group1, uuidv4());
 
-        group2FirstCreated = await groupService.register(group2, uuidv4());
-        await groupService.register(group2, uuidv4());
-        await groupService.register(group2, uuidv4());
-        group2LastUpdate = await groupService.register(group2, uuidv4());
+        group2FirstCreated = await applicationService.register(group2, uuidv4());
+        await applicationService.register(group2, uuidv4());
+        await applicationService.register(group2, uuidv4());
+        group2LastUpdate = await applicationService.register(group2, uuidv4());
 
-        summary = await groupService.getSummary();
+        summary = await applicationService.getSummary();
         console.log(JSON.stringify(summary))
 
     } catch (e) {
@@ -178,12 +179,12 @@ it('Get instances by group', async done => {
 
     try {
 
-        groupsBeforeCreation = await groupService.getByGroup(group);
+        groupsBeforeCreation = await applicationService.getByGroup(group);
 
-        await groupService.register(group, uuidv4());
-        await groupService.register(group, uuidv4());
+        await applicationService.register(group, uuidv4());
+        await applicationService.register(group, uuidv4());
 
-        groupsAfterCreation = await groupService.getByGroup(group);
+        groupsAfterCreation = await applicationService.getByGroup(group);
         console.log(JSON.stringify(groupsAfterCreation))
 
     } catch (e) {
@@ -206,10 +207,10 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
     let deletedCount: number = 0;
 
     try {
-        await groupService.register(group, uuidv4());
+        await applicationService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        deletedCount = await groupService.removeExpiredInstances(500)
+        deletedCount = await applicationService.removeExpiredInstances(500)
     } catch (e) {
         e
     }
@@ -225,10 +226,10 @@ it('Do not remove 1000ms old instance - because it is more than 2000ms old', asy
     let deletedCount: number = 0;
 
     try {
-        await groupService.register(group, uuidv4());
+        await applicationService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        deletedCount = await groupService.removeExpiredInstances(2000)
+        deletedCount = await applicationService.removeExpiredInstances(2000)
     } catch (e) {
         e
     }

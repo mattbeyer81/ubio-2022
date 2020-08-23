@@ -1,17 +1,18 @@
 import { Application } from "../models/application-model";
+import { ResponseInstance } from "../responses";
 
 class ApplicationService {
     async register(group: string, groupId: string, meta?: any) {
         const updatedAt = new Date().getTime();
-        let groupDocument = await Application.findOne({ groupId });
-        if (groupDocument) {
-            groupDocument.updatedAt = updatedAt;
+        let appplicationDocument = await Application.findOne({ groupId });
+        if (appplicationDocument) {
+            appplicationDocument.updatedAt = updatedAt;
             if (meta) {
-                groupDocument.meta = meta;
+                appplicationDocument.meta = meta;
             }
-            await groupDocument.save();
+            await appplicationDocument.save();
         } else {
-            groupDocument = await Application.create({
+            appplicationDocument = await Application.create({
                 groupId,
                 group,
                 createdAt: updatedAt,
@@ -20,7 +21,14 @@ class ApplicationService {
             })
 
         }
-        return groupDocument
+        const responseInstance: ResponseInstance = {
+            id: appplicationDocument.groupId,
+            group: appplicationDocument.group,
+            createdAt: appplicationDocument.createdAt,
+            updatedAt: appplicationDocument.updatedAt,
+            meta: appplicationDocument.meta
+        }
+        return responseInstance
     }
 
     async delete(group: string, groupId: string) {
@@ -66,4 +74,4 @@ class ApplicationService {
 
 }
 
-export const groupService = new ApplicationService
+export const applicationService = new ApplicationService

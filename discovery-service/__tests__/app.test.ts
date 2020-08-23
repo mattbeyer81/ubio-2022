@@ -1,9 +1,10 @@
 
 import * as supertest from 'supertest';
 import { app } from "../src/app"
-import { groupService } from '../src/services/group-service';
-import { GroupModel } from '../src/models/group-model';
+import { applicationService } from '../src/services/application-service';
+import { ApplicationModel } from '../src/models/application-model';
 import { v4 as uuidv4 } from 'uuid';
+import { ResponseInstance } from '../src/responses';
 
 
 it('Register instance for first time', async done => {
@@ -11,18 +12,16 @@ it('Register instance for first time', async done => {
     const createdAt = 1598105159821;
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(groupService, 'register').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
         return Promise.resolve({
-            "_id": "5f4126477e642662ad7c59f5",
-            "groupId": groupId,
+            "id": "5f4126477e642662ad7c59f5",
             "group": "particle-detector",
             "createdAt": createdAt,
             "updatedAt": createdAt,
-            "__v": 0,
             "meta": {
                 "foo": 1
             }
-        } as GroupModel)
+        } as ResponseInstance)
     })
 
     const res = await supertest(app)
@@ -40,7 +39,7 @@ it('Register instance for first time - with no groupId', async done => {
     const createdAt = 1598105159821;
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(groupService, 'register').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
         throw new Error('')
         return Promise.resolve({
             "_id": "5f4126477e642662ad7c59f5",
@@ -52,7 +51,7 @@ it('Register instance for first time - with no groupId', async done => {
             "meta": {
                 "foo": 1
             }
-        } as GroupModel)
+        } as ApplicationModel)
     })
 
     const res = await supertest(app)
@@ -69,7 +68,7 @@ it('Delete instance', async done => {
     const groupId = uuidv4();
     const group = 'particle-detector';                                                                                                                                            
 
-    jest.spyOn(groupService, 'delete').mockImplementation((groupId: string) => {
+    jest.spyOn(applicationService, 'delete').mockImplementation((groupId: string) => {
         return Promise.resolve(1)
     })
 
@@ -82,7 +81,7 @@ it('Delete instance', async done => {
 })
 
 it('Get summary', async done => {
-    jest.spyOn(groupService, 'getSummary').mockImplementation(() => {
+    jest.spyOn(applicationService, 'getSummary').mockImplementation(() => {
         return Promise.resolve([
             {
                 "_id": "particle-detector",
@@ -114,7 +113,7 @@ it('Get summary', async done => {
 
 it('Get instances by group', async done => {
     const group = 'particle-detector';
-    jest.spyOn(groupService, 'getByGroup').mockImplementation((group: string) => {
+    jest.spyOn(applicationService, 'getByGroup').mockImplementation((group: string) => {
         return Promise.resolve([
             {
                 "_id": "5f420bf75b46ad174421f260",
@@ -132,12 +131,12 @@ it('Get instances by group', async done => {
                 "updatedAt": 1598163959735,
                 "__v": 0
             }
-        ] as GroupModel[])
+        ] as ApplicationModel[])
     })
 
     const response = await supertest(app).get('/' + group);
 
-    const body: GroupModel[] = response.body;
+    const body: ApplicationModel[] = response.body;
 
     body.forEach(instance => {
         expect(instance.group).toBe(group)

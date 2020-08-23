@@ -1,7 +1,7 @@
 import * as fs from "fs"
 import { CronJob } from 'cron'
 
-import { groupService } from "../services/group-service";
+import { applicationService } from "../services/application-service";
 import { ubioConnection } from "../../src/data-access";
 
 (async () => {
@@ -9,7 +9,7 @@ import { ubioConnection } from "../../src/data-access";
     ubioConnection.on('open', async function () {
         const job = new CronJob('* * * * * *', async function () {
             const expiryAge = process.env.MILLISECOND_EXPIRY_AGE || '10000';
-            const deleteCount = await groupService.removeExpiredInstances(+expiryAge)
+            const deleteCount = await applicationService.removeExpiredInstances(+expiryAge)
             let log = fs.readFileSync('./logs/remove-expired-groups').toString();
             log = log + '\n' + new Date().toString() + `Remove expired groups count: ${deleteCount}`;
             fs.writeFileSync('./logs/remove-expired-groups', log)

@@ -1,6 +1,6 @@
 import * as express from 'express';
-import { GroupRouter } from './routers/group-routes';
+import { ApplicationRouter } from './routers/application-routes';
 
 export const app = express();
 
-app.use("/", new GroupRouter().routes);
+app.use("/", new ApplicationRouter().routes);
