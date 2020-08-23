@@ -13,7 +13,7 @@ beforeAll(done => {
     }
 })
 
-it('Create Group', async done => {
+it('Register instance for first time', async done => {
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
 
@@ -21,13 +21,13 @@ it('Create Group', async done => {
     let groupAfterCreation: GroupModel | null = null;
 
     try {
-        await groupService.register(
+        const res = await groupService.register(
             'particle-detector',
             groupId,
             {
                 "foo": 1
             });
-
+        console.log(JSON.stringify(res));
         groupAfterCreation = await Group.findOne({ groupId });
         await Group.collection.drop();
 
@@ -118,38 +118,9 @@ it('Delete', async done => {
 
 })
 
-it('Get instances by group', async done => {
-
-    const group = 'particle-detector';
-
-    let groupsBeforeCreation: GroupModel[] = [];
-    let groupsAfterCreation: GroupModel[] = [];
-
-    const collection = uuidv4();
-    try {
-
-        groupsBeforeCreation = await groupService.getByGroup(group);
-
-        await groupService.register(group, uuidv4());
-        await groupService.register(group, uuidv4());
-
-        groupsAfterCreation = await groupService.getByGroup(group);
 
 
-    } catch (e) {
-        console.error('Getting instances by group')
-    }
-    await Group.collection.drop();
-
-    expect(groupsBeforeCreation.length).toBe(0);
-    expect(groupsAfterCreation.length).toBe(2);
-
-
-    done();
-
-})
-
-it('Get summmary', async done => {
+it('Get summary', async done => {
 
     const group1 = 'particle-detector';
     const group2 = 'not-particle-detector';
@@ -173,6 +144,7 @@ it('Get summmary', async done => {
         group2LastUpdate = await groupService.register(group2, uuidv4());
 
         summary = await groupService.getSummary();
+        console.log(JSON.stringify(summary))
 
     } catch (e) {
         console.error('Getting instances by group')
@@ -192,6 +164,36 @@ it('Get summmary', async done => {
 
     expect(group2Summary.instances).toBe(4)
     expect(group1Summary.instances).toBe(2)
+
+
+    done();
+
+})
+
+it('Get instances by group', async done => {
+
+    const group = 'particle-detector';
+
+    let groupsBeforeCreation: GroupModel[] = [];
+    let groupsAfterCreation: GroupModel[] = [];
+
+    try {
+
+        groupsBeforeCreation = await groupService.getByGroup(group);
+
+        await groupService.register(group, uuidv4());
+        await groupService.register(group, uuidv4());
+
+        groupsAfterCreation = await groupService.getByGroup(group);
+        console.log(JSON.stringify(groupsAfterCreation))
+
+    } catch (e) {
+        console.error('Getting instances by group')
+    }
+    await Group.collection.drop();
+
+    expect(groupsBeforeCreation.length).toBe(0);
+    expect(groupsAfterCreation.length).toBe(2);
 
 
     done();

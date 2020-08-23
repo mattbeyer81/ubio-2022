@@ -35,7 +35,7 @@ export class GroupController {
         try {
             const params = req.params;
             const deletedCount = await groupService.delete(params.group, params.id);
-            res.send(deletedCount)
+            res.send({ deletedCount })
         } catch (e) {
             next(e)
         }
