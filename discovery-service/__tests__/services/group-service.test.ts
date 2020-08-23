@@ -1,7 +1,7 @@
-import { groupService } from "../../src/services/group-service";
+import { groupService } from "../../src/services/application-service";
 import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
-import { GroupModel, Group } from "../../src/models/group-model";
+import { ApplicationModel, Application } from "../../src/models/application-model";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
@@ -17,8 +17,8 @@ it('Register instance for first time', async done => {
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
 
-    let groupBeforeCreation: GroupModel | null = null;
-    let groupAfterCreation: GroupModel | null = null;
+    let groupBeforeCreation: ApplicationModel | null = null;
+    let groupAfterCreation: ApplicationModel | null = null;
 
     try {
         const res = await groupService.register(
@@ -27,9 +27,8 @@ it('Register instance for first time', async done => {
             {
                 "foo": 1
             });
-        console.log(JSON.stringify(res));
-        groupAfterCreation = await Group.findOne({ groupId });
-        await Group.collection.drop();
+        groupAfterCreation = await Application.findOne({ groupId });
+        await Application.collection.drop();
 
     } catch (e) {
         console.error('Creating group')
@@ -41,13 +40,13 @@ it('Register instance for first time', async done => {
 
 })
 
-it('Update already created Group', async done => {
+it('Update already created Application', async done => {
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
     ubioConnection.states.connected
-    let groupBeforeCreation: GroupModel | null = null;
-    let groupAfterCreation: GroupModel | null = null;
-    let groupAfterUpdate: GroupModel | null = null;
+    let groupBeforeCreation: ApplicationModel | null = null;
+    let groupAfterCreation: ApplicationModel | null = null;
+    let groupAfterUpdate: ApplicationModel | null = null;
 
     try {
         await groupService.register(
@@ -57,7 +56,7 @@ it('Update already created Group', async done => {
                 "foo": 1
             });
 
-        groupAfterCreation = await Group.findOne({ groupId });
+        groupAfterCreation = await Application.findOne({ groupId });
 
         groupAfterUpdate = await groupService.register(
             'particle-detector',
@@ -70,7 +69,7 @@ it('Update already created Group', async done => {
         console.error('Creating group')
     }
 
-    await Group.collection.drop();
+    await Application.collection.drop();
     expect(groupBeforeCreation).toBe(null);
     expect(groupAfterCreation && groupAfterCreation.groupId).toBe(groupId);
 
@@ -86,8 +85,8 @@ it('Delete', async done => {
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     const group = 'particle-detector';
 
-    let groupBeforeDelete: GroupModel | null = null;
-    let groupAfterDelete: GroupModel | null = null;
+    let groupBeforeDelete: ApplicationModel | null = null;
+    let groupAfterDelete: ApplicationModel | null = null;
     let deletedCount: number = 0;
 
     const collection = uuidv4();
@@ -99,15 +98,15 @@ it('Delete', async done => {
                 "foo": 1
             });
 
-        groupBeforeDelete = await Group.findOne({ groupId });
+        groupBeforeDelete = await Application.findOne({ groupId });
         deletedCount = await groupService.delete(group, groupId);
-        groupAfterDelete = await Group.findOne({ groupId });
+        groupAfterDelete = await Application.findOne({ groupId });
 
 
     } catch (e) {
         console.error('Creating group')
     }
-    await Group.collection.drop();
+    await Application.collection.drop();
 
     expect(groupBeforeDelete).not.toBe(undefined);
     expect(groupAfterDelete).toBe(null);
@@ -125,11 +124,11 @@ it('Get summary', async done => {
     const group1 = 'particle-detector';
     const group2 = 'not-particle-detector';
 
-    let group1FirstCreated: GroupModel;
-    let group1LastUpdate: GroupModel;
+    let group1FirstCreated: ApplicationModel;
+    let group1LastUpdate: ApplicationModel;
 
-    let group2FirstCreated: GroupModel;
-    let group2LastUpdate: GroupModel;
+    let group2FirstCreated: ApplicationModel;
+    let group2LastUpdate: ApplicationModel;
 
     let summary: any;
 
@@ -150,7 +149,7 @@ it('Get summary', async done => {
         console.error('Getting instances by group')
     }
 
-    await Group.collection.drop();
+    await Application.collection.drop();
     const [group1Summary, group2Summary] = summary;
 
     expect(group1Summary._id).toBe(group1)
@@ -174,8 +173,8 @@ it('Get instances by group', async done => {
 
     const group = 'particle-detector';
 
-    let groupsBeforeCreation: GroupModel[] = [];
-    let groupsAfterCreation: GroupModel[] = [];
+    let groupsBeforeCreation: ApplicationModel[] = [];
+    let groupsAfterCreation: ApplicationModel[] = [];
 
     try {
 
@@ -190,7 +189,7 @@ it('Get instances by group', async done => {
     } catch (e) {
         console.error('Getting instances by group')
     }
-    await Group.collection.drop();
+    await Application.collection.drop();
 
     expect(groupsBeforeCreation.length).toBe(0);
     expect(groupsAfterCreation.length).toBe(2);
@@ -215,7 +214,7 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
         e
     }
 
-    await Group.collection.drop();
+    await Application.collection.drop();
     expect(deletedCount).toBe(1)
     done()
 })
@@ -234,7 +233,7 @@ it('Do not remove 1000ms old instance - because it is more than 2000ms old', asy
         e
     }
 
-    await Group.collection.drop();
+    await Application.collection.drop();
     expect(deletedCount).toBe(0)
     done()
 })

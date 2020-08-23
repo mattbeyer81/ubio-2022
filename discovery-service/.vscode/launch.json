@@ -44,7 +44,7 @@
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Get instances by group",
+          "Register instance for first time - with no groupId",
           "--watch",
           "--runInBand"
         ],

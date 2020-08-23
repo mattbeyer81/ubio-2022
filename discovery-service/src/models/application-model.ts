@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 
-export interface GroupModel extends mongoose.Document {
+export interface ApplicationModel extends mongoose.Document {
     id: string;
     groupId: string;
     group: string;
@@ -9,7 +9,7 @@ export interface GroupModel extends mongoose.Document {
     meta: any
 }
 
-export const groupSchema = {
+export const applicationSchema = {
     groupId: {
         type: String,
         required: true
@@ -32,4 +32,4 @@ export const groupSchema = {
     }
 }
 
-export const Group = mongoose.model<GroupModel>('groups', new mongoose.Schema(groupSchema));
+export const Application = mongoose.model<ApplicationModel>('groups', new mongoose.Schema(applicationSchema));

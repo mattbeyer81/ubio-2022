@@ -6,7 +6,9 @@ import { GroupModel } from '../src/models/group-model';
 import { v4 as uuidv4 } from 'uuid';
 
 
-it('Register instance', async done => {
+it('Register instance for first time', async done => {
+
+    const createdAt = 1598105159821;
 
     const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
     jest.spyOn(groupService, 'register').mockImplementation((group: string, groupId: string) => {
@@ -14,8 +16,8 @@ it('Register instance', async done => {
             "_id": "5f4126477e642662ad7c59f5",
             "groupId": groupId,
             "group": "particle-detector",
-            "createdAt": 1598105159821,
-            "updatedAt": 1598105159821,
+            "createdAt": createdAt,
+            "updatedAt": createdAt,
             "__v": 0,
             "meta": {
                 "foo": 1
@@ -27,7 +29,38 @@ it('Register instance', async done => {
         .post('/particle-detector/' + groupId)
     const instance = res.body;
     expect(instance.groupId).toBe(groupId)
-    expect(instance.createdAt).toBe(1598105159821)
+    expect(instance.createdAt).toBe(createdAt)
+    expect(instance.updatedAt).toBe(createdAt)
+
+    done()
+})
+
+it('Register instance for first time - with no groupId', async done => {
+
+    const createdAt = 1598105159821;
+
+    const groupId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    jest.spyOn(groupService, 'register').mockImplementation((group: string, groupId: string) => {
+        throw new Error('')
+        return Promise.resolve({
+            "_id": "5f4126477e642662ad7c59f5",
+            "groupId": groupId,
+            "group": "particle-detector",
+            "createdAt": createdAt,
+            "updatedAt": createdAt,
+            "__v": 0,
+            "meta": {
+                "foo": 1
+            }
+        } as GroupModel)
+    })
+
+    const res = await supertest(app)
+        .post('/particle-detector/' + groupId)
+    const instance = res.body;
+    expect(instance.groupId).toBe(groupId)
+    expect(instance.createdAt).toBe(createdAt)
+    expect(instance.updatedAt).toBe(createdAt)
 
     done()
 })

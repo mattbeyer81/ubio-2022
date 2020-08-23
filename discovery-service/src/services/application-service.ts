@@ -1,9 +1,9 @@
-import { Group } from "../models/group-model";
+import { Application } from "../models/application-model";
 
-class GroupService {
+class ApplicationService {
     async register(group: string, groupId: string, meta?: any) {
         const updatedAt = new Date().getTime();
-        let groupDocument = await Group.findOne({ groupId });
+        let groupDocument = await Application.findOne({ groupId });
         if (groupDocument) {
             groupDocument.updatedAt = updatedAt;
             if (meta) {
@@ -11,7 +11,7 @@ class GroupService {
             }
             await groupDocument.save();
         } else {
-            groupDocument = await Group.create({
+            groupDocument = await Application.create({
                 groupId,
                 group,
                 createdAt: updatedAt,
@@ -24,7 +24,7 @@ class GroupService {
     }
 
     async delete(group: string, groupId: string) {
-        const { deletedCount } = await Group.deleteOne({
+        const { deletedCount } = await Application.deleteOne({
             groupId,
             group
         })
@@ -32,11 +32,11 @@ class GroupService {
     }
 
     async getByGroup(group: string) {
-        return await Group.find({ group })
+        return await Application.find({ group })
     }
 
     async getSummary() {
-        return await Group.aggregate([
+        return await Application.aggregate([
             {
                 $group: {
                     _id: "$group",
@@ -56,7 +56,7 @@ class GroupService {
      */
 
     async removeExpiredInstances(age: number) {
-        const { deletedCount }  = await Group.deleteMany({
+        const { deletedCount }  = await Application.deleteMany({
             createdAt: {
                 $lte: new Date().getTime() - age
             }
@@ -66,4 +66,4 @@ class GroupService {
 
 }
 
-export const groupService = new GroupService
+export const groupService = new ApplicationService
