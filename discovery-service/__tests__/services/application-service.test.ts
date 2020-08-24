@@ -3,7 +3,6 @@ import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
 import { ApplicationModel, Application } from "../../src/models/application-model";
 import { Registration, Summary } from "../../src/responses";
-import { readFileSync } from "fs";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
