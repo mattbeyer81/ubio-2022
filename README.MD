@@ -14,8 +14,8 @@ If you get stuck, or have any questions don't hestitate to give me a call on 079
 
 ## Requirements
 
-Docker
-Git
+* Docker
+* Git
 
 
 ## Installation
@@ -31,7 +31,7 @@ e.g:
 `MILLISECOND_EXPIRY_AGE=10000 docker compose-up`
 
 
-The service periodically removes expired instances. The "age" of the most recent heartbeat of an instance to be considered expired is configurable with environment variable `NUMBER_MILLISECONDS` and has a default value of 10000 milliseconds.
+The service periodically removes expired instances. The "age" of the most recent heartbeat of an instance to be considered expired is configurable with environment variable `MILLISECOND_EXPIRY_AGE` and has a default value of 86400000 milliseconds (1 day).
 
 This will start a node HTTP server listening on port 3000.
 
