@@ -83,19 +83,18 @@ To stop clean-up utitilty (from with container):
 ## Naming
 
 ### Application and Group
-From the spec, the main entity was considered to an `application`
-Each application belonged to a different type of `group`.
+From the spec, the main entity was considered to an `application`. Each application belonged to a different type of `group`.
 
 ### id property of the instance
 
 The instance in the spec has a property called `id` which is a unique identifier.
-mongodb generally uses the id property to create its own unique primary key for each document. It appeared that this it is possible to use an custom value for id, but this seemingly this was not possible using the chosen mongo wrapper, mongoose. Instead a property called applicationId was used to store the id provided by the client.
+mongodb generally uses the id property to create its own unique primary key for each document. Whilst it appeared that it is possible to use a custom value for id, this was not possible using the chosen mongo wrapper, mongoose. Instead a property called applicationId was used to store the id provided by the client.
 
 ## Code structure
 
-Within `src`:
+Within `discovery-service/src`:
 * server.ts, app.ts, `controllers`, `routers` - used express.js to create the node server and handle http requests, routes, and responses.
-* `services` handled the business logic, using the application `model` and mongoose to modify and update the mongdb database. The core business logic takes place in `src/services/application-service.ts`. This functionality is test in `__tests__/services/application-service.test.ts`
+* `services` handled the business logic, using the application `model` and mongoose to modify and update the mongdb database. The core business logic takes place in `src/services/application-service.ts`. This functionality is tested in `__tests__/services/application-service.test.ts`
 
 
 Within `__tests__`:
@@ -110,7 +109,7 @@ Several issues were encounted to do with importing node modules using node v12, 
 
 ### Cron
 
-Much time was spent time to get the alpine linux container to fire cronjobs. Despite experience and familarity using cron, given the time constraint it was decided to use an npm package called `cron`. This was a less than optimal solution but functional solution. 
+Much time was spent time to get the alpine linux container to fire cronjobs. Despite experience and familarity using cron, given the time constraint it was decided to use an npm package called `cron`. This was a less than solution but functional solution. 
 
 ### Mongo transactions
 
