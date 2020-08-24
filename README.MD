@@ -39,9 +39,8 @@ This will start a node HTTP server listening on port 3000.
 
 This will run a series of tests demonstrating the use of the API.
 
-
-`docker exec ubio_discoveryservice_1 sh -c "npm test -- -v"`
-
+* (To enter the docker container) `docker exec -it ubio_discoveryservice_1 sh`
+* `npm test -- --verbose`
 
 
 ## Endpoints as documented in https://github.com/ubio/technical-challenges/tree/master/backend
@@ -60,14 +59,12 @@ To play in the playgroud:
 * e.g. `curl -XDELETE 'http://localhost:3000/particle-detector/e335175a-eace-4a74-b99c-c6466b6afadd' -w "\n"`
 
 
-
-#### GET http://localhost:3000/
-* e.g: `curl -XPOST 'http://localhost:3000' -w "\n"`
+#### GET http://localhost:3000
+* e.g: `curl -XGET 'http://localhost:3000' -w "\n"`
 
 
 #### GET http://localhost:3000/:group
-* e.g.`curl -XGET 'http://localhost:3000/particle-detector/e335175a-eace-4a74-b99c-c6466b6afadd' -w "\n"`
-
+* e.g. `curl -XGET 'http://localhost:3000/particle-detector' -w "\n"`
 
 
 ## Clean up
