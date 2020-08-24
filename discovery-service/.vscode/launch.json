@@ -44,7 +44,7 @@
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Get instances by group",
+          "Get summary 2",
           "--watch",
           "--runInBand"
         ],

@@ -3,6 +3,7 @@ import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
 import { ApplicationModel, Application } from "../../src/models/application-model";
 import { Registration, Summary } from "../../src/responses";
+import { readFileSync } from "fs";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
@@ -228,11 +229,14 @@ it('Get summary 2', async done => {
     if (summary) {
         const [group1Summary, group2Summary] = summary;
 
+        expect(group1Summary.group).toBe('foo-bar')
         expect(group1Summary.createdAt).toBe(1)
         expect(group1Summary.lastUpdatedAt).toBe(120)
 
+        expect(group2Summary.group).toBe('foo-car')
         expect(group2Summary.createdAt).toBe(3)
         expect(group2Summary.lastUpdatedAt).toBe(140)
+
 
         expect(group1Summary.instances).toBe(6)
         expect(group2Summary.instances).toBe(4)
@@ -244,24 +248,27 @@ it('Get instances by group', async done => {
 
     const group = 'particle-detector';
 
-    let beforeCreation: Registration[] = [];
-    let registratsion: Registration[] = [];
+    let registrationsBefore: Registration[] = [];
+    let registrationsAfter: Registration[] = [];
     try {
 
-        // beforeCreation = await applicationService.getByGroup(group);
+        registrationsBefore = await applicationService.getByGroup(group);
 
-        await applicationService.register(group, uuidv4());
-        await applicationService.register(group, uuidv4());
+        await applicationService.register(group, 'abc');
+        await applicationService.register(group, 'def');
 
-        afterCreation = await applicationService.getByGroup(group);
+        registrationsAfter = await applicationService.getByGroup(group);
 
     } catch (e) {
         console.error('Getting instances by group')
     }
 
+    expect(registrationsAfter[0].id).toBe('abc')
+    expect(registrationsAfter[1].id).toBe('def')
 
-    expect(beforeCreation.length).toBe(0);
-    expect(afterCreation.length).toBe(2);
+
+    expect(registrationsBefore.length).toBe(0);
+    expect(registrationsAfter.length).toBe(2);
 
 
     done();

@@ -37,7 +37,11 @@ This will start a node HTTP server listening on port 3000.
 
 ## Testing
 
-This will run a series of tests demonstrating the use of the API.
+To run a sanity test, testing on the API:
+* (To enter the docker container) `docker exec -it ubio_discoveryservice_1 sh`
+* `sh sanity-test.sh`
+
+The following will run a series of jest tests located in the '__tests__' folder, testing the code base in detail:.
 
 * (To enter the docker container) `docker exec -it ubio_discoveryservice_1 sh`
 * `npm test -- --verbose`

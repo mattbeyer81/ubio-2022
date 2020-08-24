@@ -115,13 +115,13 @@ it('Get summary', async done => {
     jest.spyOn(applicationService, 'getSummary').mockImplementation(() => {
         return Promise.resolve([
             {
-                "_id": "particle-detector",
+                "group": "particle-detector",
                 "instances": 2,
                 "createdAt": 1598163492534,
                 "lastUpdatedAt": 1598163492619
             },
             {
-                "_id": "not-particle-detector",
+                "group": "not-particle-detector",
                 "instances": 4,
                 "createdAt": 1598163492628,
                 "lastUpdatedAt": 1598163492695

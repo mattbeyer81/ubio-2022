@@ -88,7 +88,9 @@ class ApplicationService {
                     updatedAt: 1,
                     createdAt: 1
                 }
-            }
+            },
+            { $sort: { id: 1  } }
+
         ])
         return registrations
     }
@@ -105,6 +107,15 @@ class ApplicationService {
                 
             },
             { $sort: { _id: 1 } },
+            {
+                $project: {
+                    _id: 0,
+                    group: "$_id",
+                    instances: 1,
+                    createdAt: 1,
+                    lastUpdatedAt: 1,
+                }
+            }
         ]);
     }
 
