@@ -4,7 +4,6 @@ import { Registration } from "../src/responses";
 
 it('Register application instance for first time', async done => {
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    let applicationIdResult: string = '';
     let registration: Registration | null = null
     try {
         const response = await Axios.post('http://localhost:3000/particle-detector/' + applicationId, { foo: 1 });
