@@ -1,8 +1,8 @@
 
 import * as supertest from 'supertest';
 import { app } from "../src/app"
-import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from '../src/services/application-service';
-import { ApplicationModel } from '../src/models/application-model';
+import { heartService, GroupNotProvidedError, ApplicationIdNotProvidedError } from '../src/services/heart-service';
+import { HeartModel } from '../src/models/heart-model';
 import { v4 as uuidv4 } from 'uuid';
 import { Registration } from '../src/responses';
 
@@ -10,7 +10,7 @@ import { Registration } from '../src/responses';
 it('Register instance for first time', async done => {
     const createdAt = 1598105159821;
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(applicationService, 'register').mockImplementation((group: string, applicationId: string) => {
+    jest.spyOn(heartService, 'register').mockImplementation((group: string, applicationId: string) => {
         return Promise.resolve({
             "id": applicationId,
             "group": "particle-detector",
@@ -34,7 +34,7 @@ it('Register instance for first time', async done => {
 it('Register instance for first time - with no id', async done => {
 
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(heartService, 'register').mockImplementation((group: string, groupId: string) => {
         throw new ApplicationIdNotProvidedError()
     })
 
@@ -49,7 +49,7 @@ it('Register instance for first time - with no id', async done => {
 it('Register instance for first time - with no group', async done => {
 
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(applicationService, 'register').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(heartService, 'register').mockImplementation((group: string, groupId: string) => {
         throw new GroupNotProvidedError()
     })
 
@@ -65,7 +65,7 @@ it('Delete instance', async done => {
     const groupId = uuidv4();
     const group = 'particle-detector';
 
-    jest.spyOn(applicationService, 'delete').mockImplementation((groupId: string) => {
+    jest.spyOn(heartService, 'delete').mockImplementation((groupId: string) => {
         return Promise.resolve(1)
     })
 
@@ -81,7 +81,7 @@ it('Delete instance - no group provided', async done => {
     const groupId = uuidv4();
     const group = 'particle-detector';
 
-    jest.spyOn(applicationService, 'delete').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(heartService, 'delete').mockImplementation((group: string, groupId: string) => {
         throw new GroupNotProvidedError()
     })
 
@@ -98,7 +98,7 @@ it('Delete instance - no id provided', async done => {
     const groupId = uuidv4();
     const group = 'particle-detector';
 
-    jest.spyOn(applicationService, 'delete').mockImplementation((group: string, groupId: string) => {
+    jest.spyOn(heartService, 'delete').mockImplementation((group: string, groupId: string) => {
         throw new ApplicationIdNotProvidedError()
     })
 
@@ -112,7 +112,7 @@ it('Delete instance - no id provided', async done => {
 })
 
 it('Get summary', async done => {
-    jest.spyOn(applicationService, 'getSummary').mockImplementation(() => {
+    jest.spyOn(heartService, 'getSummary').mockImplementation(() => {
         return Promise.resolve([
             {
                 "group": "particle-detector",
@@ -144,7 +144,7 @@ it('Get summary', async done => {
 
 it('Get instances by group', async done => {
     const group = 'particle-detector';
-    jest.spyOn(applicationService, 'getByGroup').mockImplementation((group: string) => {
+    jest.spyOn(heartService, 'getByGroup').mockImplementation((group: string) => {
         return Promise.resolve([
             {
                 "id": "7e14d0f7-6d3d-4372-bdff-ce85649e3874",
@@ -158,12 +158,12 @@ it('Get instances by group', async done => {
                 "createdAt": 1598163959735,
                 "updatedAt": 1598163959735,
             }
-        ] as ApplicationModel[])
+        ] as HeartModel[])
     })
 
     const response = await supertest(app).get('/' + group);
 
-    const body: ApplicationModel[] = response.body;
+    const body: HeartModel[] = response.body;
 
     body.forEach(instance => {
         expect(instance.group).toBe(group)
@@ -175,7 +175,7 @@ it('Get instances by group', async done => {
 
 it('Get instances by group - no group provided', async done => {
     const group = 'particle-detector';
-    jest.spyOn(applicationService, 'getByGroup').mockImplementation((group: string) => {
+    jest.spyOn(heartService, 'getByGroup').mockImplementation((group: string) => {
         throw new GroupNotProvidedError()
     })
 

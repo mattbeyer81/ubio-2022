@@ -6,9 +6,6 @@ I'm excited about being considered to join ub.io's small team of dedicated engin
 
 Below you will find the documentation to the technical test that will help you understand my ability to write clean concise code, which is easy to reason about, maintain and support.
 
-You will see my approach to naming (because we all know how hard naming is!) and structuring the entities around my codebase, as well as testing and documenting them.
-
-Good luck installing, testing and running this service, and I looking forward to being welcomed aboard.
 If you get stuck, or have any questions don't hestitate to give me a call on 07967 337442 or email me at `matthewebeyer@hotmail.com`
 
 
@@ -87,7 +84,12 @@ To stop clean-up utitilty (from with container):
 ## Naming
 
 ### Application and Group
-From the spec, the main entity was considered to an `application`. Each application belonged to a different type of `group`.
+The primary key of the stored entity was of the `application` instance.
+However, the stored entity itself did not describe an application.
+The entity itself described the lastest heartbeats of an application.
+The entity updated each time the heat beated, so the entity was name a `Heart`
+
+The unique id was unique to each application.
 
 ### id property of the instance
 

@@ -1,7 +1,7 @@
 import * as mongoose from "mongoose";
 import * as fs from "fs"
 import * as  Bluebird from 'bluebird';
-import { Application } from "../src/models/application-model";
+import { Heart } from "../src/models/heart-model";
 (<any>mongoose).Promise = Bluebird;
 
 const connectionString = `mongodb://${process.env.MONGO_HOST || 'ubio_mongoservice_1'}:27017/ubio`
@@ -12,7 +12,7 @@ const connection = mongoose.connection;
 it('Connect', done => {
     connection.on('open', async function () {
         const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-        const application = await Application.create({
+        const heart = await Heart.create({
             applicationId,
             "group": "particle-detector",
             "createdAt": 1571418096158,                     
@@ -21,7 +21,7 @@ it('Connect', done => {
                 "foo": 1
             }
         })
-        expect(application.applicationId).toBe(applicationId)
+        expect(heart.applicationId).toBe(applicationId)
         done()
     });
 

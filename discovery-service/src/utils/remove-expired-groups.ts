@@ -1,6 +1,6 @@
 import { CronJob } from 'cron'
 
-import { applicationService } from "../services/application-service";
+import { heartService } from "../services/heart-service";
 import { ubioConnection } from "../../src/data-access";
 
 (async () => {
@@ -8,7 +8,7 @@ import { ubioConnection } from "../../src/data-access";
     ubioConnection.on('open', async function () {
         const job = new CronJob('* * * * *', async function () {
             const expiryAge = process.env.MILLISECOND_EXPIRY_AGE || '86400000';
-            const deleteCount = await applicationService.removeExpiredInstances(+expiryAge)
+            const deleteCount = await heartService.removeExpiredInstances(+expiryAge)
             console.log('Expired instances - deleted count: ' + deleteCount);
         });
         

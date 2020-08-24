@@ -1,4 +1,4 @@
-import { Application } from "../models/application-model";
+import { Heart } from "../models/heart-model";
 import { Registration, Summary } from "../responses";
 
 export class GroupNotProvidedError extends Error {
@@ -17,7 +17,7 @@ export class ApplicationIdNotProvidedError extends Error {
     }
 }
 
-class ApplicationService {
+class HeartService {
     async register(group: string, applicationId: string, meta?: any) {
 
         if (!group) {
@@ -29,15 +29,15 @@ class ApplicationService {
         }
 
         const updatedAt = new Date().getTime();
-        let appplicationDocument = await Application.findOne({ applicationId });
-        if (appplicationDocument) {
-            appplicationDocument.updatedAt = updatedAt;
+        let heartDocument = await Heart.findOne({ applicationId });
+        if (heartDocument) {
+            heartDocument.updatedAt = updatedAt;
             if (meta) {
-                appplicationDocument.meta = meta;
+                heartDocument.meta = meta;
             }
-            await appplicationDocument.save();
+            await heartDocument.save();
         } else {
-            appplicationDocument = await Application.create({
+            heartDocument = await Heart.create({
                 applicationId,
                 group,
                 createdAt: updatedAt,
@@ -47,11 +47,11 @@ class ApplicationService {
 
         }
         const registration: Registration = {
-            id: appplicationDocument.applicationId,
-            group: appplicationDocument.group,
-            createdAt: appplicationDocument.createdAt,
-            updatedAt: appplicationDocument.updatedAt,
-            meta: appplicationDocument.meta
+            id: heartDocument.applicationId,
+            group: heartDocument.group,
+            createdAt: heartDocument.createdAt,
+            updatedAt: heartDocument.updatedAt,
+            meta: heartDocument.meta
         }
         return registration
     }
@@ -63,7 +63,7 @@ class ApplicationService {
         if (!applicationId) {
             throw new ApplicationIdNotProvidedError
         }
-        const { deletedCount } = await Application.deleteOne({
+        const { deletedCount } = await Heart.deleteOne({
             applicationId,
             group
         })
@@ -74,7 +74,7 @@ class ApplicationService {
         if (!group) {
             throw new GroupNotProvidedError
         }
-        const registrations = await Application.aggregate([
+        const registrations = await Heart.aggregate([
             { 
                 $match: {
                     group
@@ -96,7 +96,7 @@ class ApplicationService {
     }
 
     async getSummary(): Promise<Summary> {
-        return await Application.aggregate([
+        return await Heart.aggregate([
             {
                 $group: {
                     _id: "$group",
@@ -125,7 +125,7 @@ class ApplicationService {
      */
 
     async removeExpiredInstances(age: number) {
-        const { deletedCount }  = await Application.deleteMany({
+        const { deletedCount }  = await Heart.deleteMany({
             createdAt: {
                 $lte: new Date().getTime() - age
             }
@@ -135,4 +135,4 @@ class ApplicationService {
 
 }
 
-export const applicationService = new ApplicationService
+export const heartService = new HeartService

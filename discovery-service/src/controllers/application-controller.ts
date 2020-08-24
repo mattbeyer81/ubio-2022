@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from "../services/application-service";
+import { heartService, GroupNotProvidedError, ApplicationIdNotProvidedError } from "../services/heart-service";
 
 
 export class ApplicationController {
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;
-            const group = await applicationService.register(params.group, params.id);
+            const group = await heartService.register(params.group, params.id);
             res.send(group)
         } catch (e) {
             if (e instanceof GroupNotProvidedError || ApplicationIdNotProvidedError) {
@@ -19,7 +19,7 @@ export class ApplicationController {
 
     async getSummary(req: Request, res: Response, next: NextFunction) {
         try {
-            const group = await applicationService.getSummary();
+            const group = await heartService.getSummary();
             res.send(group)
         } catch (e) {
             next(e)
@@ -28,7 +28,7 @@ export class ApplicationController {
 
     async getByGroup(req: Request, res: Response, next: NextFunction) {
         try {
-            const group = await applicationService.getByGroup(req.params.group);
+            const group = await heartService.getByGroup(req.params.group);
             res.send(group)
         } catch (e) {
             if (e instanceof GroupNotProvidedError) {
@@ -42,7 +42,7 @@ export class ApplicationController {
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;
-            const deletedCount = await applicationService.delete(params.group, params.id);
+            const deletedCount = await heartService.delete(params.group, params.id);
             res.send({ deletedCount })
         } catch (e) {
             if (e instanceof GroupNotProvidedError || ApplicationIdNotProvidedError) {

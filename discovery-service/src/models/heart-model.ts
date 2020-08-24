@@ -1,6 +1,6 @@
 import * as mongoose from "mongoose";
 
-export interface ApplicationModel extends mongoose.Document {
+export interface HeartModel extends mongoose.Document {
     id: string;
     applicationId: string;
     group: string;
@@ -9,7 +9,7 @@ export interface ApplicationModel extends mongoose.Document {
     meta: any
 }
 
-export const applicationSchema = {
+export const heartSchema = {
     applicationId: {
         type: String,
         required: true
@@ -32,4 +32,4 @@ export const applicationSchema = {
     }
 }
 
-export const Application = mongoose.model<ApplicationModel>('groups', new mongoose.Schema(applicationSchema, { versionKey: false }));
+export const Heart = mongoose.model<HeartModel>('groups', new mongoose.Schema(heartSchema, { versionKey: false }));
