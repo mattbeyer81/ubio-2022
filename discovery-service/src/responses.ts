@@ -1,8 +1,13 @@
-// export interface GroupSummary {
-//     GroupSummary
-// }
+export interface GroupSummary {
+    group: string;
+    instances: number;
+    createdAt: number;
+    lastUpdatedAt: number;
+}
 
-export interface ResponseInstance {
+export type Summary = GroupSummary[];
+
+export interface Registration {
     id: string;
     group: string;
     createdAt: number;

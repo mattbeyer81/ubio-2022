@@ -2,48 +2,49 @@ import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedErro
 import { ubioConnection } from "../../src/data-access";
 import { v4 as uuidv4 } from 'uuid';
 import { ApplicationModel, Application } from "../../src/models/application-model";
-import { ResponseInstance } from "../../src/responses";
+import { Registration, Summary } from "../../src/responses";
 
 beforeAll(done => {
     if (ubioConnection.readyState === 1) {
         done()
     } else {
         ubioConnection.on('open', async function () {
+            await Application.deleteMany({});
             done();
         });
     }
 })
 
-it('Register applicationn instance for first time', async done => {
+afterEach(async done => {
+    await Application.deleteMany({});
+    done();
+})
 
-    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
 
-    let groupBeforeCreation: ApplicationModel | null = null;
-    let groupAfterCreation: ApplicationModel | null = null;
+it('Register application instance for first time', async done => {
+
+    const applicationId = uuidv4();
+
+    let beforeCreation: ApplicationModel | null = null;
+    let afterCreation: ApplicationModel | null = null;
 
     try {
-        const res = await applicationService.register(
-            'particle-detector',
-            applicationId,
-            {
-                "foo": 1
-            });
-        groupAfterCreation = await Application.findOne({ applicationId });
-        await Application.collection.drop();
+        await applicationService.register('particle-detector', applicationId);
+        afterCreation = await Application.findOne({ applicationId });
 
     } catch (e) {
-        console.error('Creating group')
+        console.error('Creating registration')
     }
 
-    expect(groupBeforeCreation).toBe(null);
-    expect(groupAfterCreation && groupAfterCreation.applicationId).toBe(applicationId);
+    expect(beforeCreation).toBe(null);
+    expect(afterCreation && afterCreation.applicationId).toBe(applicationId);
     done();
 
 })
 
 it('Register applicationn instance for first time - with no group', async done => {
 
-    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
+    const applicationId = uuidv4();
 
     try {
         await applicationService.register(
@@ -55,15 +56,11 @@ it('Register applicationn instance for first time - with no group', async done =
 
     } catch (e) {
         expect(e instanceof GroupNotProvidedError).toBe(true)
+        done();
     }
-
-    done();
-
 })
 
 it('Register applicationn instance for first time - with no id', async done => {
-
-    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
 
     try {
         await applicationService.register(
@@ -75,19 +72,16 @@ it('Register applicationn instance for first time - with no id', async done => {
 
     } catch (e) {
         expect(e instanceof ApplicationIdNotProvidedError).toBe(true)
+        done();
     }
-
-    done();
-
 })
 
 it('Update already created Application', async done => {
 
-    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd'
-    ubioConnection.states.connected
-    let groupBeforeCreation: ApplicationModel | null = null;
-    let groupAfterCreation: ApplicationModel | null = null;
-    let groupAfterUpdate: ResponseInstance | null = null;
+    const applicationId = uuidv4();
+    let beforeCreation: ApplicationModel | null = null;
+    let afterCreation: ApplicationModel | null = null;
+    let afterUpdate: Registration | null = null;
 
     try {
         await applicationService.register(
@@ -97,9 +91,9 @@ it('Update already created Application', async done => {
                 "foo": 1
             });
 
-        groupAfterCreation = await Application.findOne({ applicationId });
+        afterCreation = await Application.findOne({ applicationId });
 
-        groupAfterUpdate = await applicationService.register(
+        afterUpdate = await applicationService.register(
             'particle-detector',
             applicationId,
             {
@@ -107,27 +101,26 @@ it('Update already created Application', async done => {
             });
 
     } catch (e) {
-        console.error('Creating group')
+        console.error('Updating registration')
     }
 
-    await Application.collection.drop();
-    expect(groupBeforeCreation).toBe(null);
-    expect(groupAfterCreation && groupAfterCreation.applicationId).toBe(applicationId);
-
-    expect(groupAfterCreation && groupAfterCreation.createdAt).toBe(groupAfterUpdate && groupAfterUpdate.createdAt);
-    // expect(groupAfterCreation && groupAfterCreation.updatedAt).toBeLessThan(groupAfterUpdate && groupAfterUpdate.updatedAt);
-
-    done();
+    if (afterUpdate && afterCreation) {
+        expect(beforeCreation).toBe(null);
+        expect(afterCreation.applicationId).toBe(applicationId);
+        expect(afterCreation.createdAt).toBe(afterCreation && afterUpdate.createdAt);
+        expect(afterCreation && afterCreation.updatedAt).toBeLessThan(afterUpdate.updatedAt);
+        done();
+    }
 
 })
 
 it('Delete', async done => {
 
-    const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
+    const applicationId = uuidv4();
     const group = 'particle-detector';
 
-    let applicationBeforeDelete: ApplicationModel | null = null;
-    let applicationAfterDelete: ApplicationModel | null = null;
+    let beforeDelete: ApplicationModel | null = null;
+    let afterDelete: ApplicationModel | null = null;
     let deletedCount: number = 0;
 
     try {
@@ -138,20 +131,18 @@ it('Delete', async done => {
                 "foo": 1
             });
 
-        applicationBeforeDelete = await Application.findOne({ applicationId });
+        beforeDelete = await Application.findOne({ applicationId });
         deletedCount = await applicationService.delete(group, applicationId);
-        applicationAfterDelete = await Application.findOne({ applicationId });
+        afterDelete = await Application.findOne({ applicationId });
 
 
     } catch (e) {
         console.error('Creating group')
     }
-    await Application.collection.drop();
 
-    expect(applicationBeforeDelete).not.toBe(undefined);
-    expect(applicationAfterDelete).toBe(null);
+    expect(beforeDelete).not.toBe(undefined);
+    expect(afterDelete).toBe(null);
     expect(deletedCount).toBe(1);
-
 
     done();
 
@@ -177,28 +168,17 @@ it('Delete - no id provided', async done => {
 })
 
 
-it('Get summary', async done => {
+it('Get summary 1', async done => {
 
-    const group1 = 'particle-detector';
-    const group2 = 'not-particle-detector';
-
-    let group1FirstCreated: ResponseInstance;
-    let group1LastUpdate: ResponseInstance;
-
-    let group2FirstCreated: ResponseInstance;
-    let group2LastUpdate: ResponseInstance;
-
-    let summary: any;
-
+    let summary: Summary | null = null;
     try {
-
-        group1FirstCreated = await applicationService.register(group1, uuidv4());
-        group1LastUpdate = await applicationService.register(group1, uuidv4());
-
-        group2FirstCreated = await applicationService.register(group2, uuidv4());
-        await applicationService.register(group2, uuidv4());
-        await applicationService.register(group2, uuidv4());
-        group2LastUpdate = await applicationService.register(group2, uuidv4());
+        await Application.insertMany([
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 1, updatedAt: 10 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 20 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 3, updatedAt: 30 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 4, updatedAt: 40 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 5, updatedAt: 50 },
+        ])
 
         summary = await applicationService.getSummary();
 
@@ -206,24 +186,58 @@ it('Get summary', async done => {
         console.error('Getting instances by group')
     }
 
-    await Application.collection.drop();
-    const [group1Summary, group2Summary] = summary;
+    if (summary) {
+        const [group1Summary, group2Summary] = summary;
 
-    expect(group1Summary._id).toBe(group1)
-    expect(group2Summary._id).toBe(group2)
+        expect(group1Summary.createdAt).toBe(1)
+        expect(group1Summary.lastUpdatedAt).toBe(20)
 
-    // expect(group1Summary.createdAt).toBe(group1FirstCreated.createdAt)
-    // expect(group1Summary.updatedAt).toBe(group1LastUpdate.updatedAt)
+        expect(group2Summary.createdAt).toBe(3)
+        expect(group2Summary.lastUpdatedAt).toBe(50)
 
-    // expect(group2Summary.createdAt).toBe(group2FirstCreated.createdAt)
-    // expect(group2Summary.updatedAt).toBe(group2LastUpdate.updatedAt)
+        expect(group1Summary.instances).toBe(2)
+        expect(group2Summary.instances).toBe(3)
+        done();
+    }
+})
 
-    expect(group2Summary.instances).toBe(4)
-    expect(group1Summary.instances).toBe(2)
+it('Get summary 2', async done => {
 
+    let summary: Summary | null = null;
 
-    done();
+    try {
+        await Application.insertMany([
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 3, updatedAt: 30 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 4, updatedAt: 140 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 5, updatedAt: 50 },
+            { applicationId: uuidv4(), group: 'foo-car', createdAt: 5, updatedAt: 50 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 1, updatedAt: 10 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 120 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 5 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 20 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 20 },
+            { applicationId: uuidv4(), group: 'foo-bar', createdAt: 2, updatedAt: 20 },
+        ])
 
+        summary = await applicationService.getSummary();
+
+    } catch (e) {
+        console.error('Getting instances by group')
+    }
+
+    if (summary) {
+        const [group1Summary, group2Summary] = summary;
+
+        expect(group1Summary.createdAt).toBe(1)
+        expect(group1Summary.lastUpdatedAt).toBe(120)
+
+        expect(group2Summary.createdAt).toBe(3)
+        expect(group2Summary.lastUpdatedAt).toBe(140)
+
+        expect(group1Summary.instances).toBe(6)
+        expect(group2Summary.instances).toBe(4)
+        done();
+    }
 })
 
 it('Get instances by group', async done => {
@@ -232,7 +246,7 @@ it('Get instances by group', async done => {
 
     let groupsBeforeCreation: ApplicationModel[] = [];
     let groupsAfterCreation: ApplicationModel[] = [];
-
+    await Application.deleteMany({});
     try {
 
         groupsBeforeCreation = await applicationService.getByGroup(group);
@@ -245,7 +259,6 @@ it('Get instances by group', async done => {
     } catch (e) {
         console.error('Getting instances by group')
     }
-    await Application.collection.drop();
 
     expect(groupsBeforeCreation.length).toBe(0);
     expect(groupsAfterCreation.length).toBe(2);
@@ -263,7 +276,6 @@ it('Get instances by group - no group provided', async done => {
         expect(e instanceof GroupNotProvidedError).toBe(true)
         done();
     }
-
 })
 
 
@@ -272,17 +284,16 @@ it('Remove expired 1000ms old instance - because it is more than 500ms old', asy
     const group = 'particle-detector';
 
     let deletedCount: number = 0;
-
+    await Application.deleteMany({});
     try {
         await applicationService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         deletedCount = await applicationService.removeExpiredInstances(500)
     } catch (e) {
-        e
+        console.log('There was an error removing expired instances more than 500ms old')
     }
 
-    await Application.collection.drop();
     expect(deletedCount).toBe(1)
     done()
 })
@@ -292,16 +303,16 @@ it('Do not remove 1000ms old instance - because it is more than 2000ms old', asy
     const group = 'particle-detector';
     let deletedCount: number = 0;
 
+    await Application.deleteMany({ createdAt: { $gte: 0 } });
     try {
         await applicationService.register(group, uuidv4());
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         deletedCount = await applicationService.removeExpiredInstances(2000)
     } catch (e) {
-        e
+        console.log('There was an error removing expired instances more than 2000ms old')
     }
 
-    await Application.collection.drop();
     expect(deletedCount).toBe(0)
     done()
 })

@@ -4,7 +4,7 @@ import { app } from "../src/app"
 import { applicationService, GroupNotProvidedError, ApplicationIdNotProvidedError } from '../src/services/application-service';
 import { ApplicationModel } from '../src/models/application-model';
 import { v4 as uuidv4 } from 'uuid';
-import { ResponseInstance } from '../src/responses';
+import { Registration } from '../src/responses';
 
 
 it('Register instance for first time', async done => {
@@ -23,7 +23,7 @@ it('Register instance for first time', async done => {
     })
     const res = await supertest(app)
         .post('/particle-detector/' + applicationId)
-    const instance: ResponseInstance = res.body;
+    const instance: Registration = res.body;
     expect(instance.id).toBe(applicationId)
     expect(instance.createdAt).toBe(createdAt)
     expect(instance.updatedAt).toBe(createdAt)

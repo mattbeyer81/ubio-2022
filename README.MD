@@ -98,7 +98,8 @@ mongodb generally uses the id property to create its own unique primary key for 
 
 Within `src`:
 * server.ts, app.ts, `controllers`, `routers` - used express.js to create the node server and handle http requests, routes, and responses.
-* `services` handled the business logic, using the application `model` and mongoose to modify and update the mongdb database
+* `services` handled the business logic, using the application `model` and mongoose to modify and update the mongdb database. The core business logic takes place in `src/services/application-service.ts`. This functionality is test in `__tests__/services/application-service.test.ts`
+
 
 Within `__tests__`:
 * jest was used to test each of these layers
