@@ -1,5 +1,5 @@
 import { Application } from "../models/application-model";
-import { Registration } from "../responses";
+import { Registration, Summary } from "../responses";
 
 export class GroupNotProvidedError extends Error {
     constructor(m?: string) {
@@ -70,14 +70,30 @@ class ApplicationService {
         return deletedCount || 0
     }
 
-    async getByGroup(group: string) {
+    async getByGroup(group: string): Promise<Registration[]> {
         if (!group) {
             throw new GroupNotProvidedError
         }
-        return await Application.find({ group })
+        const registrations = await Application.aggregate([
+            { 
+                $match: {
+                    group
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    id: "$applicationId",
+                    group: 1,
+                    updatedAt: 1,
+                    createdAt: 1
+                }
+            }
+        ])
+        return registrations
     }
 
-    async getSummary() {
+    async getSummary(): Promise<Summary> {
         return await Application.aggregate([
             {
                 $group: {

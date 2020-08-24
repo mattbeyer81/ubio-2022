@@ -28,7 +28,7 @@ If you get stuck, or have any questions don't hestitate to give me a call on 079
 
 e.g:
 
-`MILLISECOND_EXPIRY_AGE=10000 docker compose-up`
+`MILLISECOND_EXPIRY_AGE=10000 docker-compose up`
 
 
 The service periodically removes expired instances. The "age" of the most recent heartbeat of an instance to be considered expired is configurable with environment variable `MILLISECOND_EXPIRY_AGE` and has a default value of 86400000 milliseconds (1 day).
@@ -45,7 +45,7 @@ This will run a series of tests demonstrating the use of the API.
 
 ## Endpoints as documented in https://github.com/ubio/technical-challenges/tree/master/backend
 
-To play in the playgroud:
+To play with this API:
 
 `docker exec -it ubio_discoveryservice_1 sh` 
 

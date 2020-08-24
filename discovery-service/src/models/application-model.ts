@@ -32,4 +32,4 @@ export const applicationSchema = {
     }
 }
 
-export const Application = mongoose.model<ApplicationModel>('groups', new mongoose.Schema(applicationSchema));
+export const Application = mongoose.model<ApplicationModel>('groups', new mongoose.Schema(applicationSchema, { versionKey: false }));

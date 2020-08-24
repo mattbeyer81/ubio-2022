@@ -244,24 +244,24 @@ it('Get instances by group', async done => {
 
     const group = 'particle-detector';
 
-    let groupsBeforeCreation: ApplicationModel[] = [];
-    let groupsAfterCreation: ApplicationModel[] = [];
-    await Application.deleteMany({});
+    let beforeCreation: Registration[] = [];
+    let registratsion: Registration[] = [];
     try {
 
-        groupsBeforeCreation = await applicationService.getByGroup(group);
+        // beforeCreation = await applicationService.getByGroup(group);
 
         await applicationService.register(group, uuidv4());
         await applicationService.register(group, uuidv4());
 
-        groupsAfterCreation = await applicationService.getByGroup(group);
+        afterCreation = await applicationService.getByGroup(group);
 
     } catch (e) {
         console.error('Getting instances by group')
     }
 
-    expect(groupsBeforeCreation.length).toBe(0);
-    expect(groupsAfterCreation.length).toBe(2);
+
+    expect(beforeCreation.length).toBe(0);
+    expect(afterCreation.length).toBe(2);
 
 
     done();

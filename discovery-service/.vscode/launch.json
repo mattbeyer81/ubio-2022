@@ -38,13 +38,13 @@
         "name": "Debug Current Jest File and Specific Test",
         "type": "node",
         "request": "launch",
-        "runtimeExecutable": "/Users/mattproj/.nvm/versions/node/v10.22.0/bin/node",
+        // "runtimeExecutable": "/Users/mattproj/.nvm/versions/node/v10.22.0/bin/node",
         "runtimeArgs": [
           "--inspect-brk",
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Register instance for first time - with no groupId",
+          "Get instances by group",
           "--watch",
           "--runInBand"
         ],
