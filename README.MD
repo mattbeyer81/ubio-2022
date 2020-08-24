@@ -83,11 +83,13 @@ To stop clean-up utitilty (from with container):
 
 ## Naming
 
-### Application and Group
+### Application Heartbeats
 The primary key of the stored entity was of the `application` instance.
 However, the stored entity itself did not describe an application.
 The entity itself described the lastest heartbeats of an application.
-The entity updated each time the heat beated, so the entity was name a `Heart`
+When a new heartbeat was registered the entity was timestamp was updated. 
+The entity updating was not a heartbeat, or an application instance.
+Given this information the entity was name a `Heart`
 
 The unique id was unique to each application.
 
@@ -100,7 +102,7 @@ mongodb generally uses the id property to create its own unique primary key for 
 
 Within `discovery-service/src`:
 * server.ts, app.ts, `controllers`, `routers` - used express.js to create the node server and handle http requests, routes, and responses.
-* `services` handled the business logic, using the application `model` and mongoose to modify and update the mongdb database. The core business logic takes place in `src/services/application-service.ts`. This functionality is tested in `__tests__/services/application-service.test.ts`
+* `services` handled the business logic, using the heart `model` and mongoose to modify and update the mongdb database. The core business logic takes place in `src/services/heart-service.ts`. This functionality is tested in `__tests__/services/heart-service.test.ts`
 
 
 Within `__tests__`:
