@@ -259,8 +259,8 @@ it('Get instances by group', async done => {
 
         registrationsBefore = await heartService.getByGroup(group);
 
-        await heartService.register(group, 'abc');
-        await heartService.register(group, 'def');
+        await heartService.register(group, 'abc', { foo: 1 });
+        await heartService.register(group, 'def', { foo: 2 });
 
         registrationsAfter = await heartService.getByGroup(group);
 
@@ -270,6 +270,9 @@ it('Get instances by group', async done => {
 
     expect(registrationsAfter[0].id).toBe('abc')
     expect(registrationsAfter[1].id).toBe('def')
+
+    expect(registrationsAfter[0].meta).toStrictEqual({ foo: 1 })
+    expect(registrationsAfter[1].meta).toStrictEqual({ foo: 2 })
 
 
     expect(registrationsBefore.length).toBe(0);

@@ -86,7 +86,8 @@ class HeartService {
                     id: "$applicationId",
                     group: 1,
                     updatedAt: 1,
-                    createdAt: 1
+                    createdAt: 1,
+                    meta: 1
                 }
             },
             { $sort: { id: 1  } }
