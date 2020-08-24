@@ -6,7 +6,7 @@ export class ApplicationController {
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;
-            const group = await heartService.register(params.group, params.id);
+            const group = await heartService.register(params.group, params.id, req.body);
             res.send(group)
         } catch (e) {
             if (e instanceof GroupNotProvidedError || ApplicationIdNotProvidedError) {

@@ -44,7 +44,7 @@
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Get summary 2",
+          "Register application instance for first time",
           "--watch",
           "--runInBand"
         ],

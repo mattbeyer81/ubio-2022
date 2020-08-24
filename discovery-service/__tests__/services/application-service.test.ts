@@ -27,9 +27,10 @@ it('Register application instance for first time', async done => {
 
     let beforeCreation: HeartModel | null = null;
     let afterCreation: HeartModel | null = null;
+    let registration: Registration | null = null;
 
     try {
-        await heartService.register('particle-detector', applicationId);
+        registration = await heartService.register('particle-detector', applicationId,  { foo: 1 });
         afterCreation = await Heart.findOne({ applicationId });
 
     } catch (e) {
@@ -37,8 +38,13 @@ it('Register application instance for first time', async done => {
     }
 
     expect(beforeCreation).toBe(null);
-    expect(afterCreation && afterCreation.applicationId).toBe(applicationId);
-    done();
+    if (afterCreation && registration) {
+        expect(afterCreation.applicationId).toBe(applicationId);
+        expect(afterCreation.meta).toStrictEqual({ foo: 1 });
+        expect(registration.meta).toStrictEqual({ foo: 1 });
+        done();
+
+    }
 
 })
 

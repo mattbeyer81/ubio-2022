@@ -7,26 +7,27 @@ import { v4 as uuidv4 } from 'uuid';
 import { Registration } from '../src/responses';
 
 
-it('Register instance for first time', async done => {
+it('Register application instance for first time', async done => {
     const createdAt = 1598105159821;
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
-    jest.spyOn(heartService, 'register').mockImplementation((group: string, applicationId: string) => {
+    const meta = { foo: 1 };
+    jest.spyOn(heartService, 'register').mockImplementation((group: string, applicationId: string, meta: any) => {
         return Promise.resolve({
             "id": applicationId,
             "group": "particle-detector",
             "createdAt": createdAt,
             "updatedAt": createdAt,
-            "meta": {
-                "foo": 1
-            }
+            meta
         })
     })
     const res = await supertest(app)
         .post('/particle-detector/' + applicationId)
+        .send(meta)
     const instance: Registration = res.body;
     expect(instance.id).toBe(applicationId)
     expect(instance.createdAt).toBe(createdAt)
     expect(instance.updatedAt).toBe(createdAt)
+    expect(instance.meta).toStrictEqual(meta)
 
     done()
 })
