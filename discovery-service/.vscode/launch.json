@@ -44,7 +44,7 @@
           "${workspaceRoot}/node_modules/.bin/jest",
           "${fileBasename}",
           "-t",
-          "Register application instance for first time",
+          "Get instances by group",
           "--watch",
           "--runInBand"
         ],

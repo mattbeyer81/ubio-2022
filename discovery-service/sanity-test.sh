@@ -1,5 +1,5 @@
 echo 'Create: '
-curl -d '{"foo": 1}' 'http://localhost:3000/particle-detector/e335175a-eace-4a74-b99c-c6466b6afadd' -w "\n"
+curl -XPOST -H "Content-type: application/json" -d '{"foo": 1}' 'http://localhost:3000/particle-detector/e335175a-eace-4a74-b99c-c6466b6afadd' -w "\n"
 
 echo 'Delete'
 curl -XDELETE 'http://localhost:3000/particle-detector/e335175a-eace-4a74-b99c-c6466b6afadd' -w "\n"

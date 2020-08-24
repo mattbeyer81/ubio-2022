@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { ApplicationController } from "../controllers/application-controller";
+import { HeartController } from "../controllers/heart-controller";
 const router = Router();
 
-export class ApplicationRouter {
+export class HeartRouter {
   get routes() {
-    const controller = new ApplicationController();
+    const controller = new HeartController();
     router.post("/:group/:id", controller.register);
     router.delete("/:group/:id", controller.delete);
     router.get("/", controller.getSummary);

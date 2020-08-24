@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { heartService, GroupNotProvidedError, ApplicationIdNotProvidedError } from "../services/heart-service";
 
 
-export class ApplicationController {
+export class HeartController {
     async register(req: Request, res: Response, next: NextFunction) {
         try {
             const params = req.params;

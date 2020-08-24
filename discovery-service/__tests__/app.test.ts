@@ -6,7 +6,6 @@ import { HeartModel } from '../src/models/heart-model';
 import { v4 as uuidv4 } from 'uuid';
 import { Registration } from '../src/responses';
 
-
 it('Register application instance for first time', async done => {
     const createdAt = 1598105159821;
     const applicationId = 'e335175a-eace-4a74-b99c-c6466b6afadd';
