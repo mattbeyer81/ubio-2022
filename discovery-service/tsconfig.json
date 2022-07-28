@@ -1,20 +1,18 @@
 {
-    "compilerOptions": {
+  "compilerOptions": {
+      "target": "es5",
+      "lib": ["es6"],
+      "types": ["reflect-metadata", "jest"],
       "module": "commonjs",
-      "target": "es2016",
       "moduleResolution": "node",
-      "noImplicitAny": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "outDir": "./build",
-      "sourceMap": true,
-      "rootDir": ".",
-      "strict": true,
-      "skipLibCheck": true
-    },
-    "include": [
-      "src/**/*",
-      "__tests__/**/*",
-    ],
-    "exclude": ["node_modules", "**/*.spec.ts"]
-    }
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "noEmit": false,
+      "resolveJsonModule": true,
+      "outDir": "build",
+      "allowJs": true
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

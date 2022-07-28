@@ -4,5 +4,5 @@ import * as  Bluebird from 'bluebird';
 
 const connectionString = `mongodb://${ process.env.MONGO_HOST || 'ubio_mongoservice_1' }:27017/ubio`
 
-mongoose.connect(connectionString, { useNewUrlParser: true, useUnifiedTopology: true } );
+mongoose.connect(connectionString);
 export const ubioConnection = mongoose.connection;

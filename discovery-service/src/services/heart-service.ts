@@ -1,5 +1,9 @@
+import { inject, injectable } from "inversify";
 import { Heart } from "../models/heart-model";
+import { IHeartRepository } from "../repositories/heart-repository-interface";
 import { Registration, Summary } from "../responses";
+import { TYPES } from "../types";
+import { IHeartService } from "./heart-service-interface";
 
 export class GroupNotProvidedError extends Error {
     constructor(m?: string) {
@@ -17,8 +21,18 @@ export class ApplicationIdNotProvidedError extends Error {
     }
 }
 
-class HeartService {
-    async register(group: string, applicationId: string, meta?: any) {
+@injectable()
+export class HeartService implements IHeartService {
+
+    private _heartRepository: IHeartRepository;
+
+    public constructor(
+	    @inject(TYPES.HeartRepository) heartRepository: IHeartRepository
+    ) {
+        this._heartRepository = heartRepository;
+    }
+
+    public async register(group: string, applicationId: string, meta?: any) {
 
         if (!group) {
             throw new GroupNotProvidedError
@@ -29,15 +43,15 @@ class HeartService {
         }
 
         const updatedAt = new Date().getTime();
-        let heartDocument = await Heart.findOne({ applicationId });
-        if (heartDocument) {
-            heartDocument.updatedAt = updatedAt;
+        let heart = await this._heartRepository.findOneByApplicationId(applicationId);
+        if (heart) {
+            heart.updatedAt = updatedAt;
             if (meta) {
-                heartDocument.meta = meta;
+                heart.meta = meta;
             }
-            await heartDocument.save();
+            await this._heartRepository.save(heart);
         } else {
-            heartDocument = await Heart.create({
+            heart = await this._heartRepository.create({
                 applicationId,
                 group,
                 createdAt: updatedAt,
@@ -47,77 +61,36 @@ class HeartService {
 
         }
         const registration: Registration = {
-            id: heartDocument.applicationId,
-            group: heartDocument.group,
-            createdAt: heartDocument.createdAt,
-            updatedAt: heartDocument.updatedAt,
-            meta: heartDocument.meta
+            id: heart.applicationId,
+            group: heart.group,
+            createdAt: heart.createdAt,
+            updatedAt: heart.updatedAt,
+            meta: heart.meta
         }
         return registration
     }
 
-    async delete(group: string, applicationId: string) {
+    public async delete(group: string, applicationId: string) {
         if (!group) {
             throw new GroupNotProvidedError
         }
         if (!applicationId) {
             throw new ApplicationIdNotProvidedError
         }
-        const { deletedCount } = await Heart.deleteOne({
-            applicationId,
-            group
-        })
+        const deletedCount = await this._heartRepository.deleteOne(applicationId, group);
         return deletedCount || 0
     }
 
-    async getByGroup(group: string): Promise<Registration[]> {
+    public async getByGroup(group: string): Promise<Registration[]> {
         if (!group) {
             throw new GroupNotProvidedError
         }
-        const registrations = await Heart.aggregate([
-            { 
-                $match: {
-                    group
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    id: "$applicationId",
-                    group: 1,
-                    updatedAt: 1,
-                    createdAt: 1,
-                    meta: 1
-                }
-            },
-            { $sort: { id: 1  } }
-
-        ])
+        const registrations = await this._heartRepository.getByGroup(group);
         return registrations
     }
 
-    async getSummary(): Promise<Summary> {
-        return await Heart.aggregate([
-            {
-                $group: {
-                    _id: "$group",
-                    instances: { $sum: 1 },
-                    createdAt: { $min: "$createdAt" },
-                    lastUpdatedAt: { $max: "$updatedAt" },
-                },
-                
-            },
-            { $sort: { _id: 1 } },
-            {
-                $project: {
-                    _id: 0,
-                    group: "$_id",
-                    instances: 1,
-                    createdAt: 1,
-                    lastUpdatedAt: 1,
-                }
-            }
-        ]);
+    public async getSummary(): Promise<Summary> {
+        return await this._heartRepository.getSummary();
     }
 
     /**
@@ -125,7 +98,7 @@ class HeartService {
      * @param {number} age - The age in milliseconds when an instances expires
      */
 
-    async removeExpiredInstances(age: number) {
+     public async removeExpiredInstances(age: number) {
         const { deletedCount }  = await Heart.deleteMany({
             createdAt: {
                 $lte: new Date().getTime() - age
@@ -135,5 +108,3 @@ class HeartService {
     }
 
 }
-
-export const heartService = new HeartService

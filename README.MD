@@ -17,7 +17,7 @@ If you get stuck, or have any questions don't hestitate to give me a call on 079
 
 ## Installation
 
-`git clone https://gitlab.com/matthewbeyer/ubio.git`
+`git clone https://gitlab.com/matthewbeyer/ubio-2022.git`
 
 `cd ubio`
 

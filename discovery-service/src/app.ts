@@ -1,8 +1,17 @@
-import * as express from 'express';
-import * as bodyParser from 'body-parser'
-import { HeartRouter } from './routers/application-routes';
+import 'reflect-metadata';
+import * as bodyParser from 'body-parser';
+import { InversifyExpressServer } from 'inversify-express-utils';
 
-export const app = express();
+import './controllers/country-controller';
+import { container } from './inversify.config';
 
-app.use(bodyParser.json())
-app.use("/", new HeartRouter().routes);
+let server = new InversifyExpressServer(container);
+server.setConfig((app) => {
+  app.use(bodyParser.urlencoded({
+    extended: true
+  }));
+  app.use(bodyParser.json());
+});
+
+export const app = server.build();
+
